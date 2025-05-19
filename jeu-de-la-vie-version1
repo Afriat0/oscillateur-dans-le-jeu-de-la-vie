@@ -1,0 +1,246 @@
+import matplotlib.pyplot as plt
+import pygame
+import time
+import numpy as np
+
+#code  de chatgpt afin d'afficher des images contenues dans une liste grace a pygame avec un delai de 0.5 par defaut
+def afficher_images_fullscreen(l1, delay=0.5):
+    pygame.init()
+    # Récupérer la résolution de l'écran
+    info = pygame.display.Info()
+    screen_width, screen_height = info.current_w, info.current_h
+    # Passer en plein écran
+    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+    pygame.display.set_caption("Jeu de la vie")
+    for img in l1:
+        # Redimensionner l'image à la taille de l'écran
+        img_surface = pygame.surfarray.make_surface(np.transpose(img, (1, 0, 2)))
+        img_surface = pygame.transform.scale(img_surface, (screen_width, screen_height))
+        screen.blit(img_surface, (0, 0))
+        pygame.display.flip()
+        # Pause et gestion des événements
+        start_time = time.time()
+        while time.time() - start_time < delay:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    pygame.quit()
+                    return
+    time.sleep(1)
+    pygame.quit()
+
+
+
+#code pour changer l'etat de la case i j du tableau t afin qu'elle represente l'etat de cette meme case apres 
+#avoir appliquer une etape au tableau l
+def etape(l,t,i,j):
+    acc=-l[i][j]
+    for x in range(i-1,i+2):
+        for y in range(j-1,j+2):
+            acc=acc+l[x][y]
+    if l[i][j]==1 and (acc==2 or acc==3):
+        t[i][j]=1
+        return t
+    if l[i][j]==0 and acc==3:
+        t[i][j]=1
+        return t
+    t[i][j]=0
+    return t
+
+#code principal qui renvoie le tableau encodant l'etape suivante du jeu de la vie.ici j'ai choisi une implementation 
+#particuliere ou je garde constament en memoire ou commence et ou finit la figure que represente la liste,
+#avec l[0]la premiere ligne non nulle,l[1] la derniere (si t=0,l[0]>l[1]), et l[2] et l[3] la premiere et derniere
+# colonne non nulle 
+def etat_suivant(l):
+    #premiere partie:appliquer etat_suivant a toutes les cases succeptibles de changer
+    if l[0]>l[1] or l[2]>l[3]:
+        return l
+    t=[ l[0],l[1],l[2],l[3]]+[[0 for j in range(len(l[4]))] for i in range(len(l)-4)]
+    for i in range(t[0]-1,t[1]+2):
+        for j in range(t[2]-1,t[3]+2):
+            etape(l,t,i,j)
+    #deuxieme partie:tant que le tableau n'est pas bien encadree, verifier si la premiere/derniere colonne/ligne est 
+    #(non) nulle et changer t en consequence
+    c=1
+    while c==1 and t[0]<t[1] and t[2]<t[3]:
+        c=0
+        s=0
+        for j in range(l[2]-1,l[3]+2):
+            s=s+t[t[0]-1][j]
+        if s>0:
+            c=1
+            t[0]=t[0]-1
+        s=0
+        for j in range(l[2]-1,l[3]+2):
+            s=s+t[t[1]+1][j]
+        if s>0:
+            c=1
+            t[1]=t[1]+1
+        s=0
+        for j in range(l[0]-1,l[1]+2):
+            s=s+t[j][t[2]-1]
+        if s>0:
+            c=1
+            t[2]=t[2]-1
+        s=0
+        for j in range(l[0]-1,l[1]+2):
+            s=s+t[j][t[3]+1]
+        if s>0:
+            c=1
+            t[3]=t[3]+1
+        s=0
+        for j in range(l[2]-1,l[3]+2):
+            s=s+t[t[0]][j]
+        if s==0:
+            c=1
+            t[0]=t[0]+1
+        s=0
+        for j in range(l[2]-1,l[3]+2):
+            s=s+t[t[1]][j]
+        if s==0:
+            c=1
+            t[1]=t[1]-1
+        s=0
+        for j in range(l[0]-1,l[1]+2):
+            s=s+t[j][t[2]]
+        if s==0:
+            c=1
+            t[2]=t[2]+1
+        s=0
+        for j in range(l[0]-1,l[1]+2):
+            s=s+t[j][t[3]]
+        if s==0:
+            c=1
+            t[3]=t[3]-1
+    if c==1:
+        return [(t[0]+t[1])//2,(t[0]+t[1])//2,(t[2]+t[3])//2,(t[2]+t[3])//2]+[[0 for j in range(len(l[4]))] for i in range(len(l)-4)]
+    return t
+
+
+#prend en entree la representation "simple" d'une figure dans le jeu de la vie, et renvoie son implementation 
+#en rajoutant n 0 dans tout les sens
+def initialisation(l,n):
+    t=[[0 for j in range(2*n+len(l[0]))] for i in range(2*n+len(l)+4)]
+    t[0], t[1], t[2], t[3] = n+4, n+4+len(l)-1, n, n+len(l[0])-1
+    for i in range(n+4,n+4+len(l)):
+        for j in range(n,n+len(l[0])):
+            t[i][j]=l[i-n-4][j-n]
+    return t
+
+def initialisation1(l,n):
+    t=[n+4,n+4+len(l)-1,n,n+len(l[0])-1]+[[0 for j in range(2*n+len(l[0]))] for i in range(2*n+len(l))]
+    for i in range(n+4,n+4+len(l)):
+        for j in range(n,n+len(l[0])):
+            t[i][j]=l[i-n-4][j-n]
+    return t
+
+
+
+
+def min(a,b):
+    if a>b:
+        return b
+    return a
+def max(a,b):
+    if a>b:
+        return a
+    return b
+
+#afficher les n etapes succesives dans le jeu de la vie en partant de 'l'etape 0 encodee par la figure l
+def show(input,n,laps):
+    l=initialisation(input,n+3)
+    nbr1=len(l)
+    nbr2=len(l[4])
+    liste=[l]
+    for k in range(n):
+        l=etat_suivant(l)
+        liste.append(l)
+    l1=[]
+    l2=[]
+    for l in liste:
+        l1.append([[(250*l[i][j],250*l[i][j],250*l[i][j]) for j in range(min(l[2],l[0])-1,max(l[1],l[3])+2)] for i in range(min(l[0],l[2])-1,max(l[1],l[3])+2)]) 
+        l2.append([[(250*l[i][j],250*l[i][j],250*l[i][j]) for j in range(nbr2)] for i in range(4,nbr1)])
+    print("l1 et l2 realises avec succes")
+    afficher_images_fullscreen(l2,laps)
+    afficher_images_fullscreen(l1,laps/2)
+
+figures={'glider': [[0, 1, 0], [0, 0, 1], [1, 1, 1]], 'blinker': [[1, 1, 1]], 'toad': [[
+0, 1, 1, 1], [1, 1, 1, 0]], 'beacon': [[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1],
+ [0, 0, 1, 1]], 'pulsar': [[0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0], [0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 
+0, 0, 1, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1
+, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]], 'pentadecathlon': [[0, 1, 0], [1, 1, 1], [0, 1
+, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [1, 1, 1], [0, 1, 0]], 'lwss': [[0, 1, 1,
+ 1, 1], [1, 0, 0, 0, 1], [0, 0, 0, 0, 1], [1, 0, 0, 1, 0]], 'mwss': [[0, 1, 1, 1
+, 1, 1], [1, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1], [1, 0, 0, 0, 1, 0]], 'hwss': [[
+0, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 1], [1, 0, 0, 0,
+ 0, 1, 0]], 'diehard': [[0, 0, 0, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 0], [0, 1, 0, 
+0, 0, 1, 1]], 'acorn': [[0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0], [1, 1, 0, 
+0, 1, 1, 1]], 'r-pentomino': [[0, 1, 1], [1, 1, 0], [0, 1, 0]], 'block': [[1, 1]
+, [1, 1]], 'boat': [[1, 1, 0], [1, 0, 1], [0, 1, 0]], 'loaf': [[0, 1, 1, 0], [1,
+ 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 0]], 'tub': [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+, 'snake': [[1, 1, 0], [0, 1, 1], [0, 0, 1]]}
+
+gosper_glider_gun = [
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+]
+
+# Positions actives (définies relativement au coin supérieur gauche)
+pattern = [
+    (5,1),(5,2),(6,1),(6,2),
+    (5,11),(6,11),(7,11),
+    (4,12),(8,12),
+    (3,13),(9,13),
+    (3,14),(9,14),
+    (6,15),
+    (4,16),(8,16),
+    (5,17),(6,17),(7,17),
+    (6,18),
+    (3,21),(4,21),(5,21),
+    (3,22),(4,22),(5,22),
+    (2,23),(6,23),
+    (1,25),(2,25),(6,25),(7,25),
+    (3,35),(4,35),(3,36),(4,36)
+]
+
+
+# Remplissage de la matrice
+for x, y in pattern:
+    gosper_glider_gun[x-1][y-1] = 1
+
+spacefiller = [
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+    [0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0],
+    [0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0],
+    [0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0]
+]
+
+
+
+
+a=[[0,0,0,1,0,0],[0,1,0,0,0,1],[1,0,0,0,0,0],[1,0,0,0,0,1],[1,1,1,1,1,0]]
+
+b=[[1,1,1]] 
+
+show(figures['pentadecathlon'],20,0.2)
+
