@@ -1,11 +1,11 @@
-import matplotlib.pyplot as plt
 import pygame
 import time
+import sys
 import numpy as np
 
 #code  de chatgpt afin d'afficher des images contenues dans une liste grace a pygame avec un delai de 0.5 par defaut
 def afficher_images_fullscreen(l1, delay=0.5):
-    pygame.init()
+ #   pygame.init()
     # Récupérer la résolution de l'écran
     info = pygame.display.Info()
     screen_width, screen_height = info.current_w, info.current_h
@@ -26,8 +26,7 @@ def afficher_images_fullscreen(l1, delay=0.5):
                     pygame.quit()
                     return
     time.sleep(1)
-    pygame.quit()
-
+ #   pygame.quit()
 
 
 #code pour changer l'etat de la case i j du tableau t afin qu'elle represente l'etat de cette meme case apres 
@@ -137,8 +136,6 @@ def initialisation1(l,n):
     return t
 
 
-
-
 def min(a,b):
     if a>b:
         return b
@@ -149,8 +146,10 @@ def max(a,b):
     return b
 
 #afficher les n etapes succesives dans le jeu de la vie en partant de 'l'etape 0 encodee par la figure l
-def show(input,n,laps,option_d_affichage=False):
-    l=initialisation(input,n+3)
+def show(input,n,laps,taille=-1,option_d_affichage=False):
+    if taille==-1:
+        taille=n
+    l=initialisation(input,taille +2)
     nbr1=len(l)
     nbr2=len(l[4])
     liste=[l]
@@ -167,58 +166,6 @@ def show(input,n,laps,option_d_affichage=False):
     afficher_images_fullscreen(l1,laps/2)
     if option_d_affichage==True:
         return liste
-
-def est_oscillateur(l1,n,n1):
-    l2=initialisation(l1,n1+3)
-    l=recoupe(l2,l2)
-    a,b,c,d=l[0],l[1],l[2],l[3]
-    for k in range(1,n+1):
-        l=etat_suivant(l)
-        if l[1]-l[0]==b-a and l[3]-l[2]==d-c:
-            if [[l[i][j] for j in range(l[2],l[3]+1)] for i in range(l[0],l[1]+1)]==l1:
-                if l[0]==a and l[2]==c:
-                    return ("oscillateur",k)
-                else:
-                    return ("vaisseau",k)
-    return False
-
-def binaire(x,n):
-    l=[0 for i in range(n)]
-    for i1 in range(n):
-        i=n-i1-1
-        if x>=2**i:
-            l[i]=1
-            x=x-2**i
-    return l
-
-
-
-
-def genererfigures(n,p):
-    l=[]
-    for i1 in range(1,2**(n*p)+1):
-        l1=[[0 for j in range(p)] for i in range(n)]
-        l2=binaire(i1,n*p)
-        for x in range(n):
-            for y in range(p):
-                l1[x][y]=l2[x+n*y]
-        l.append(l1)
-    return l
-
-
-def tout_les_oscillateurs(n,p):
-    liste=genererfigures(n,p)
-    l1=[]
-    print("generée")
-    for l in liste:
-        print(1,end="",flush=True)
-        k=est_oscillateur(l,2**(n*p),4)
-        if k!=False:
-            print(k)
-            l1.append((l,k))
-    return l1
-            
-
 
 figures={'glider': [[0, 1, 0], [0, 0, 1], [1, 1, 1]], 'blinker': [[1, 1, 1]], 'toad': [[
 0, 1, 1, 1], [1, 1, 1, 0]], 'beacon': [[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1],
@@ -260,12 +207,9 @@ gosper_glider_gun = [
 a=[[0,0,0,1,0,0],[0,1,0,0,0,1],[1,0,0,0,0,0],[1,0,0,0,0,1],[1,1,1,1,1,0]]
 
 b=[[1,1,1]] 
-
-show(figures['hwss'],8,0.1)
-
-L=list(figures.keys())
-for j in L:
-    print(j,est_oscillateur(figures[j],50,50))
-
-#print(tout_les_oscillateurs(3,3))
-
+# pygame.init()
+# L=list(figures.keys())
+# for j in L:
+#     show(figures[j],20,0.03,15)
+# show(gosper_glider_gun,80,0.03,40)
+# pygame.quit()
