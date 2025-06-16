@@ -1,0 +1,61 @@
+
+
+#code pour changer l'etat de la case i j du tableau t afin qu'elle represente l'etat de cette meme case apres 
+#avoir appliquer une etape au tableau l
+def etape(l,i,j):
+    acc=-l[i][j]
+    for x in range(i-1,i+2):
+        for y in range(j-1,j+2):
+            acc=acc+l[x][y]
+    if l[i][j]==1 and (acc==2 or acc==3):
+        return 1
+    if l[i][j]==0 and acc==3:
+        return 1
+    return 0
+
+def etat_suivant(l):
+    n,m=len(l),len(l[0])
+    t=[[0 for j in range(m)] for i in range(n)]
+    for i in range(1,n-1):
+        for j in range(1,m-1):
+            t[i][j]=etape(l,i,j)
+    return t
+
+
+def initialisation(l,n,m):
+    t=[[0 for j in range(len(l[0])+2*m)] for i in range(len(l)+2*n)]
+    for i in range(len(l)):
+        for j in range(len(l[0])):
+            t[i+n][j+m]=l[i][j]
+    return t
+
+def est_oscillateur(l,temps,n,m):
+    t=initialisation(l,n,m)
+    l=initialisation(l,n,m)
+    for k in range(1,temps+1):
+        l=etat_suivant(l)
+        if l==t:
+            return k
+    return False
+
+
+figures={'glider': [[0, 1, 0], [0, 0, 1], [1, 1, 1]], 'blinker': [[1, 1, 1]], 'toad': [[
+0, 1, 1, 1], [1, 1, 1, 0]], 'beacon': [[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1],
+ [0, 0, 1, 1]], 'pulsar': [[0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0], [0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 
+0, 0, 1, 0, 1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1
+, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0]], 'pentadecathlon': [[0, 1, 0], [1, 1, 1], [0, 1
+, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [1, 1, 1], [0, 1, 0]], 'lwss': [[0, 1, 1,
+ 1, 1], [1, 0, 0, 0, 1], [0, 0, 0, 0, 1], [1, 0, 0, 1, 0]], 'mwss': [[0, 1, 1, 1
+, 1, 1], [1, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1], [1, 0, 0, 0, 1, 0]], 'hwss': [[
+0, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 1], [1, 0, 0, 0,
+ 0, 1, 0]], 'diehard': [[0, 0, 0, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 0], [0, 1, 0, 
+0, 0, 1, 1]], 'acorn': [[0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0], [1, 1, 0, 
+0, 1, 1, 1]], 'r-pentomino': [[0, 1, 1], [1, 1, 0], [0, 1, 0]], 'block': [[1, 1]
+, [1, 1]], 'boat': [[1, 1, 0], [1, 0, 1], [0, 1, 0]], 'loaf': [[0, 1, 1, 0], [1,
+ 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 0]], 'tub': [[0, 1, 0], [1, 0, 1], [0, 1, 0]]
+, 'snake': [[1, 1, 0], [0, 1, 1], [0, 0, 1]]}
+
+L=list(figures.keys())
+for j in L:
+    print(j,est_oscillateur(figures[j],50,50,50))
