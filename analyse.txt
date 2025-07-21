@@ -1,0 +1,91 @@
+import matplotlib.pyplot as plt
+import time
+
+f=open("analyseherschel.txt","r")
+l=f.readlines()
+a=[(0,0) for i in range(43,300)]
+for i in range(61,300):
+    b=l[i-61]
+    b=b.split(',')
+    t=int(b[1])
+    x=int(b[2][1:])
+    t=t/(10**9)
+    a[i-43]=(t,x)
+f.close()
+#print(a)
+f=open("analysesnark.txt","r")
+l=f.readlines()
+c=[(0,0) for i in range(43,300)]
+for i in range(43,300):
+    b=l[i-43]
+    b=b.split(',')
+    t=int(b[1])
+    x=int(b[2][1:])
+    t=t/(10**9)
+    c[i-43]=(t,x)
+f.close()
+#print(c)
+
+f=open("analysesnarkbeaucoup.txt","r")
+l=f.readlines()
+d=[(0,0) for i in range(43,1500)]
+for i in range(43,1500):
+    b=l[i-43]
+    b=b.split(',')
+    t=int(b[1])
+    x=int(b[2][1:])
+    t=t/(10**9)
+    d[i-43]=(t,x)
+f.close()
+#print(c)
+
+entree=[i for i in range(43,300)]
+tempsnark=[c[i][0] for i in range(len(c))]
+tempherschel=[a[i][0] for i in range(len(a))]
+taillesnark=[c[i][1] for i in range(len(c))]
+tailleherschel=[a[i][1] for i in range(len(a))]
+taillesnarkbeaucoup=[d[i][1] for i in range(len(d))]
+tempsnarkbeaucoup=[d[i][0] for i in range(len(d))]
+plt.scatter(entree,tempsnark, label='temps de realisation de l\'oscillateur Snark selon p')
+plt.scatter(entree,tempherschel, label='temps de realisation de l\'oscillateur Hershel selon p')
+plt.legend()
+plt.title("Comparaison du temps de réalisation des oscillateurs Snark et Herschel")
+plt.xlabel("Periode p")
+plt.ylabel("temps de realisation (s)")
+
+plt.show(block=False)
+plt.pause(30)
+plt.close()
+
+plt.scatter(entree,taillesnark, label='taille de l\'oscillateur Snark selon p')
+plt.scatter(entree,tailleherschel, label='taille de l\'oscillateur Hershel selon p')
+plt.legend()
+plt.title("Comparaison de la taille des oscillateurs Snark et Herschel")
+plt.xlabel("Periode p")
+plt.ylabel("taille du carré contenant l\'oscillateur (en cases)")
+
+plt.show(block=False)
+plt.pause(30)
+plt.close()
+
+plt.scatter(tempsnarkbeaucoup,taillesnarkbeaucoup, label='taille de l\'oscillateur Snark selon le temps pris a le realiser')
+plt.scatter(tempherschel,tailleherschel, label='taille de l\'oscillateur Hershel selon le temps pris a le realiser')
+plt.legend()
+plt.title("Comparaison de l'efficacité du programme realisant des oscillateurs Snark et Herschel")
+plt.xlabel("temps de realisation (s)")
+plt.ylabel("taille du carré contenant l\'oscillateur (en cases)")
+
+plt.show(block=False)
+plt.pause(30)
+plt.close()
+
+plt.scatter(taillesnarkbeaucoup,tempsnarkbeaucoup, label='temps de realisation de l\'oscillateur Snark selon sa taille')
+plt.scatter(tailleherschel,tempherschel, label='temps de realisation de l\'oscillateur Hershel selon sa taille')
+plt.legend()
+plt.title("Comparaison de l'efficacité du programme realisant des oscillateurs Snark et Herschel")
+plt.xlabel("taille du carré contenant l\'oscillateur (en cases)")
+plt.ylabel("temps de realisation (s)")
+
+plt.show(block=False)
+plt.pause(30)
+plt.close()
