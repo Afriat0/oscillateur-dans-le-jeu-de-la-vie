@@ -1,6 +1,5 @@
 import pygame
 import time
-import sys
 import numpy as np
 
 #code  de chatgpt afin d'afficher des images contenues dans une liste grace a pygame avec un delai de 0.5 par defaut
@@ -28,95 +27,94 @@ def afficher_images_fullscreen(l1, delay=0.5):
     time.sleep(1)
  #   pygame.quit()
 
-
 #code pour changer l'etat de la case i j du tableau t afin qu'elle represente l'etat de cette meme case apres 
 #avoir appliquer une etape au tableau l
 def etape(l,t,i,j):
-    acc=-l[i][j]
+    acc = - l[i][j]
     for x in range(i-1,i+2):
         for y in range(j-1,j+2):
-            acc=acc+l[x][y]
-    if l[i][j]==1 and (acc==2 or acc==3):
-        t[i][j]=1
+            acc = acc + l[x][y]
+    if l[i][j] == 1 and (acc == 2 or acc == 3):
+        t[i][j] = 1
         return t
-    if l[i][j]==0 and acc==3:
-        t[i][j]=1
+    if l[i][j] == 0 and acc == 3:
+        t[i][j] = 1
         return t
-    t[i][j]=0
+    t[i][j] = 0
     return t
 
-#code principal qui renvoie le tableau encodant l'etape suivante du jeu de la vie.ici j'ai choisi une implementation 
-#particuliere ou je garde constament en memoire ou commence et ou finit la figure que represente la liste,
-#avec l[0]la premiere ligne non nulle,l[1] la derniere (si t=0,l[0]>l[1]), et l[2] et l[3] la premiere et derniere
-# colonne non nulle 
+"""code principal qui renvoie le tableau encodant l'etape suivante du jeu de la vie.ici j'ai choisi une implementation 
+particuliere ou je garde constament en memoire ou commence et ou finit la figure que represente la liste,
+avec l[0]la premiere ligne non nulle,l[1] la derniere (si t=0,l[0]>l[1]), et l[2] et l[3] la premiere et derniere
+colonne non nulle """
+
 def etat_suivant(l):
     #premiere partie:appliquer etat_suivant a toutes les cases succeptibles de changer
-    #if l[0]>l[1] or l[2]>l[3]:
-     #   return l
-    t=[ l[0],l[1],l[2],l[3]]+[[0 for j in range(len(l[4]))] for i in range(len(l)-4)]
+    #if l[0] > l[1] or l[2] > l[3]:
+    #   return l
+    t=[ l[0] , l[1] , l[2] , l[3] ] +[[0 for j in range(len(l[4]))] for i in range(len(l)-4)]
     for i in range(t[0]-1,t[1]+2):
         for j in range(t[2]-1,t[3]+2):
             etape(l,t,i,j)
     return recoupe(l,t)
-    #deuxieme partie:tant que le tableau n'est pas bien encadree, verifier si la premiere/derniere colonne/ligne est 
-    #(non) nulle et changer t en consequence
+"""deuxieme partie:tant que le tableau n'est pas bien encadree, verifier si la premiere/derniere colonne/ligne est 
+(non) nulle et changer t en consequence"""
 def recoupe(l,t1):
-    t=[t1[0],t1[1],t1[2],t1[3]]+[[t1[i][j] for j in range(len(t1[4]))] for i in range(4,len(t1))]
-    c=1
-    while c==1 and t[0]<=t[1] and t[2]<=t[3]:
-        c=0
-        s=0
+    t=[ t1[0] , t1[1] , t1[2] , t1[3] ] +[[t1[i][j] for j in range(len(t1[4]))] for i in range(4,len(t1))]
+    c = 1
+    while c == 1 and t[0] <= t[1] and t[2] <= t[3]:
+        c = 0
+        s = 0
         for j in range(l[2]-1,l[3]+2):
-            s=s+t[t[0]-1][j]
-        if s>0:
-            c=1
-            t[0]=t[0]-1
-        s=0
+            s = s + t[t[0]-1][j]
+        if s > 0:
+            c = 1
+            t[0] = t[0] - 1
+        s = 0
         for j in range(l[2]-1,l[3]+2):
-            s=s+t[t[1]+1][j]
-        if s>0:
-            c=1
-            t[1]=t[1]+1
-        s=0
+            s = s + t[t[1]+1][j]
+        if s > 0:
+            c = 1
+            t[1] = t[1] + 1
+        s = 0
         for j in range(l[0]-1,l[1]+2):
-            s=s+t[j][t[2]-1]
-        if s>0:
-            c=1
-            t[2]=t[2]-1
-        s=0
+            s = s + t[j][t[2]-1]
+        if s > 0:
+            c = 1
+            t[2] = t[2] - 1
+        s = 0
         for j in range(l[0]-1,l[1]+2):
-            s=s+t[j][t[3]+1]
-        if s>0:
-            c=1
-            t[3]=t[3]+1
-        s=0
+            s = s + t[j][t[3]+1]
+        if s > 0:
+            c = 1
+            t[3] = t[3] + 1
+        s = 0
         for j in range(l[2]-1,l[3]+2):
-            s=s+t[t[0]][j]
-        if s==0:
-            c=1
-            t[0]=t[0]+1
-        s=0
+            s = s + t[t[0]][j]
+        if s == 0:
+            c = 1
+            t[0] = t[0] + 1
+        s = 0
         for j in range(l[2]-1,l[3]+2):
-            s=s+t[t[1]][j]
-        if s==0:
-            c=1
-            t[1]=t[1]-1
-        s=0
+            s = s + t[t[1]][j]
+        if s == 0:
+            c = 1
+            t[1] = t[1] - 1
+        s = 0
         for j in range(l[0]-1,l[1]+2):
-            s=s+t[j][t[2]]
-        if s==0:
-            c=1
-            t[2]=t[2]+1
-        s=0
+            s = s + t[j][t[2]]
+        if s == 0:
+            c = 1
+            t[2] = t[2] + 1
+        s = 0
         for j in range(l[0]-1,l[1]+2):
-            s=s+t[j][t[3]]
-        if s==0:
-            c=1
-            t[3]=t[3]-1
-    if c==1:
-        return [(t[0]+t[1])//2,(t[0]+t[1])//2,(t[2]+t[3])//2,(t[2]+t[3])//2]+[[0 for j in range(len(l[4]))] for i in range(len(l)-4)]
+            s = s + t[j][t[3]]
+        if s == 0:
+            c = 1
+            t[3] = t[3] - 1
+    if c == 1:
+        return [ (t[0] + t[1]) // 2 , (t[0] + t[1]) // 2,(t[2] + t[3]) // 2,( t[2] + t[3]) // 2]+[[0 for j in range(len(l[4]))] for i in range(len(l)-4)]
     return t
-
 
 #prend en entree la representation "simple" d'une figure dans le jeu de la vie, et renvoie son implementation 
 #en rajoutant n 0 dans tout les sens
@@ -134,7 +132,6 @@ def initialisation1(l,n):
         for j in range(n,n+len(l[0])):
             t[i][j]=l[i-n-4][j-n]
     return t
-
 
 def min(a,b):
     if a>b:
@@ -159,13 +156,13 @@ def show(input,n,laps,taille=-1,option_d_affichage=False):
     l1=[]
     l2=[]
     for l in liste:
-        l1.append([[(250*l[i][j],250*l[i][j],250*l[i][j]) for j in range(l[2]-1,l[2]+max(l[3]-l[2],l[1]-l[0])+2)] for i in range(l[0]-1,l[0]+max(l[1]-l[0],l[3]-l[2])+2)]) 
+        l1.append([[(250*l[i][j],250*l[i][j],250*l[i][j]) for j in range(l[2]-1,min(l[2]+max(l[3]-l[2],l[1]-l[0])+2,nbr2))] for i in range(l[0]-1,min(l[0]+max(l[1]-l[0],l[3]-l[2])+2,nbr1))]) 
         l2.append([[(250*l[i][j],250*l[i][j],250*l[i][j]) for j in range(nbr2)] for i in range(4,nbr1)])
     print("l1 et l2 realises avec succes")
     afficher_images_fullscreen(l2,laps)
     afficher_images_fullscreen(l1,laps/2)
     if option_d_affichage==True:
-        return liste
+        return l1
 
 figures={'glider': [[0, 1, 0], [0, 0, 1], [1, 1, 1]], 'blinker': [[1, 1, 1]], 'toad': [[
 0, 1, 1, 1], [1, 1, 1, 0]], 'beacon': [[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1],
@@ -202,14 +199,3 @@ gosper_glider_gun = [
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-
-
-a=[[0,0,0,1,0,0],[0,1,0,0,0,1],[1,0,0,0,0,0],[1,0,0,0,0,1],[1,1,1,1,1,0]]
-
-b=[[1,1,1]] 
-# pygame.init()
-# L=list(figures.keys())
-# for j in L:
-#     show(figures[j],20,0.03,15)
-# show(gosper_glider_gun,80,0.03,40)
-# pygame.quit()
