@@ -1,0 +1,155 @@
+import affichage as affiche
+import pygame
+import recherche_conduit_de_Herschell1 as herschel
+import verification_et_theorie as verif
+glider=[[1,0,1],[0,1,1],[0,1,0]]
+glider2=[[1,0,0],[0,1,1],[1,1,0]]
+snark=[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],[0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0],[0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+snarkdroite=[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+snarkgauche=[[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+snarkalenvers=[[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+
+def oscillateur(p):
+    k=(p-1)/2
+    m=k
+    if k%1!=0:
+        k=p//2-1
+        m=p//2
+    k,m=int(k),int(m)
+    a=[[0 for i in range(40+p)] for j in range(40+p)]
+    bordgauchedroit=(10+p,10+m)
+    b=(bordgauchedroit[0],bordgauchedroit[1])
+    for i in range(len(snark)):
+        for j in range(len(snark[0])):
+            a[i+b[0]][j+b[1]]=snark[i][j]
+    bordgauchegauche=(b[0]+6-k,b[1]+2+k)
+    b=(bordgauchegauche[0],bordgauchegauche[1])
+    for i in range(len(snarkgauche)):
+        for j in range(len(snarkgauche[0])):
+            a[i+b[0]][j+b[1]]=snarkgauche[i][j]
+    bordgauchealenvers=(b[0]-6-m,b[1]+6-m)
+    b=(bordgauchealenvers[0],bordgauchealenvers[1])
+    for i in range(len(snarkalenvers)):
+        for j in range(len(snarkalenvers[0])):
+            a[i+b[0]][j+b[1]]=snarkalenvers[i][j]
+    bordgauchedroite=(b[0]-2+k,b[1]-6-k)
+    b=(bordgauchedroite[0],bordgauchedroite[1])
+    for i in range(len(snarkdroite)):
+        for j in range(len(snarkdroite[0])):
+            a[i+b[0]][j+b[1]]=snarkdroite[i][j]
+    print("le chemin a ete trace")
+    if p%2==1:
+        droit=(bordgauchedroit[0]+7,bordgauchedroit[1]+9)
+        droite=(bordgauchedroite[0]+9,bordgauchedroite[1]+13)
+        gauche=(bordgauchegauche[0]+7,bordgauchegauche[1]+7)
+        alenvers=(bordgauchealenvers[0]+13,bordgauchealenvers[1]+7)
+        b=glider
+        c=herschel.tourner_droite(glider)
+        d=herschel.tourner_gauche(glider)
+        e=herschel.tourner_droite(herschel.tourner_droite(glider))
+        for i in range(len(b)):
+            for j in range(len(b[0])):
+                a[droit[0]+i][droit[1]+j]=b[i][j]
+        for i in range(len(c)):
+            for j in range(len(c[0])):
+                a[droite[0]+i][droite[1]+j]=c[i][j]
+        for i in range(len(d)):
+            for j in range(len(d[0])):
+                a[gauche[0]+i][gauche[1]+j]=d[i][j]
+        for i in range(len(e)):
+            for j in range(len(e[0])):
+                a[alenvers[0]+i][alenvers[1]+j]=e[i][j]
+        o=p//4
+        droitrebond=(droit[0]+6-o,droit[1]+o-1)
+        droiterebond=(droite[0]+o-1,droite[1]+o-6)
+        gaucherebond=(gauche[0]+1-o,gauche[1]+6-o)
+        alenversrebond=(alenvers[0]+o-6,alenvers[1]-o+1)
+        f=[[glider[2-i][j] for j in range(3)] for i in range(3)]
+        b=verif.initialisation(f,2,2)
+        for _ in range(p%4):
+            b=verif.etat_suivant(b)
+        c=herschel.tourner_droite(b)
+        d=herschel.tourner_gauche(b)
+        e=herschel.tourner_droite(herschel.tourner_droite(b))
+        for i in range(len(b)):
+            for j in range(len(b[0])):
+                if b[i][j]==1:
+                    a[droitrebond[0]+i-2][droitrebond[1]-2+j]=b[i][j]
+        for i in range(len(c)):
+            for j in range(len(c[0])):
+                if c[i][j]==1:
+                    a[droiterebond[0]+i-2][droiterebond[1]-2+j]=c[i][j]
+        for i in range(len(d)):
+            for j in range(len(d[0])):
+                if d[i][j]==1:
+                    a[gaucherebond[0]+i-2][gaucherebond[1]-2+j]=d[i][j]
+        for i in range(len(e)):
+            for j in range(len(e[0])):
+                if e[i][j]==1:
+                    a[alenversrebond[0]+i-2][alenversrebond[1]-2+j]=e[i][j]
+        print("le glisseur a ete place")
+        return a
+    if p%2==0:
+        droit=(bordgauchedroit[0]+6,bordgauchedroit[1]+9)
+        droite=(bordgauchedroite[0]+9,bordgauchedroite[1]+13)
+        gauche=(bordgauchegauche[0]+7,bordgauchegauche[1]+7)
+        alenvers=(bordgauchealenvers[0]+14,bordgauchealenvers[1]+7)
+        b=glider2
+        c=herschel.tourner_droite(glider)
+        d=herschel.tourner_gauche(glider)
+        e=herschel.tourner_droite(herschel.tourner_droite(glider2))
+        for i in range(len(b)):
+            for j in range(len(b[0])):
+                a[droit[0]+i][droit[1]+j]=b[i][j]
+        for i in range(len(c)):
+            for j in range(len(c[0])):
+                a[droite[0]+i][droite[1]+j]=c[i][j]
+        for i in range(len(d)):
+            for j in range(len(d[0])):
+                a[gauche[0]+i][gauche[1]+j]=d[i][j]
+        for i in range(len(e)):
+            for j in range(len(e[0])):
+                a[alenvers[0]+i][alenvers[1]+j]=e[i][j]
+        o1=(p)//4
+        o2=(p-2)//4
+        droitrebond=(droit[0]+7-o2,droit[1]+o2-1)
+        droiterebond=(droite[0]+o1-1,droite[1]+o1-6)
+        gaucherebond=(gauche[0]+1-o1,gauche[1]+6-o1)
+        alenversrebond=(alenvers[0]+o2-7,alenvers[1]-o2+1)
+        f=[[glider[2-i][j] for j in range(3)] for i in range(3)]
+        g=verif.initialisation(f,2,2)
+        for _ in range(p%4):
+            g=verif.etat_suivant(g)
+        c=herschel.tourner_droite(g)
+        b=verif.initialisation(f,2,2)
+        for _ in range((p-2)%4):
+            b=verif.etat_suivant(b)
+        d=herschel.tourner_gauche(g)
+        e=herschel.tourner_droite(herschel.tourner_droite(b))
+        for i in range(len(b)):
+            for j in range(len(b[0])):
+                if b[i][j]==1:
+                    a[droitrebond[0]+i-2][droitrebond[1]-2+j]=b[i][j]
+        for i in range(len(c)):
+            for j in range(len(c[0])):
+                if c[i][j]==1:
+                    a[droiterebond[0]+i-2][droiterebond[1]-2+j]=c[i][j]
+        for i in range(len(d)):
+            for j in range(len(d[0])):
+                if d[i][j]==1:
+                    a[gaucherebond[0]+i-2][gaucherebond[1]-2+j]=d[i][j]
+        for i in range(len(e)):
+            for j in range(len(e[0])):
+                if e[i][j]==1:
+                    a[alenversrebond[0]+i-2][alenversrebond[1]-2+j]=e[i][j]
+        print("le glisseur a ete place")
+        return a
+
+"""a=oscillateur(43)
+b=verif.est_oscillateur(a,50,10,10)
+print(b)
+pygame.init()
+affiche.show(a,43,0.1,10)
+affiche.show(a,86,0.05,10)
+pygame.quit()"""
