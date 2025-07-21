@@ -1,0 +1,39 @@
+import snark 
+import recherche_conduit_de_Herschell1 as herschel
+import time
+
+#à lancer une seule fois pour créer les fichiers
+f=open("analyseherschel.txt","w")
+
+for i in range(61,300):
+    t=time.time_ns()
+    a=herschel.oscillateur2(i)
+    xmin,xmax,ymin,ymax=a
+    taille=(xmax-xmin+1,ymax-ymin+1)
+    if len(a)!=4:
+        print("non!")
+    f.write(f"{i},{(time.time_ns()-t)},{taille}\n")
+    if taille[0]!=taille[1]:
+        print("hein?")
+    print(i)
+f.close()
+
+g=open("analysesnark.txt","w")
+
+for i in range(43,300):
+    print(i)
+    t=time.time_ns()
+    a=snark.oscillateur(i)
+    g.write(f"{i},{(time.time_ns()-t)},{(40+i,40+i)}\n")
+    print(i)
+g.close()
+
+h=open("analysesnarkbeaucoup.txt","w")
+
+for i in range(43,1500):
+    print(i)
+    t=time.time_ns()
+    a=snark.oscillateur(i)
+    h.write(f"{i},{(time.time_ns()-t)},{(40+i,40+i)}\n")
+    print(i)
+h.close()
