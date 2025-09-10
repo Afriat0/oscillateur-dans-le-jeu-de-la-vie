@@ -7,7 +7,7 @@ f=open("analyseherschel.txt","w")
 
 for i in range(61,300):
     t=time.time_ns()
-    a=herschel.oscillateur2(i)
+    a=herschel.oscillateuranalyse(i)
     xmin,xmax,ymin,ymax=a
     taille=(xmax-xmin+1,ymax-ymin+1)
     if len(a)!=4:
