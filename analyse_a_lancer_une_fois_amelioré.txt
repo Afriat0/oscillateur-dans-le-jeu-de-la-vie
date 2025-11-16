@@ -1,0 +1,17 @@
+import herschelameliore
+import time
+
+#à lancer une seule fois pour créer les fichiers
+f=open("analyseherschelamelioresuite.txt","w")
+
+for i in range(61,7200):
+    t=time.time_ns()
+    a=herschelameliore.oscillateur(i)
+    temps=time.time_ns
+    a,k1,k2,k3,A,B=herschelameliore.plus_petits_sans_156(i)
+    taille=herschelameliore.limit_de_oscillateur(k1,k2,k3,A,B)
+    f.write(f"{i},{(time.time_ns()-t)},{taille}\n")
+    if i%100==0:
+        print(i)
+        f.flush()
+f.close()
