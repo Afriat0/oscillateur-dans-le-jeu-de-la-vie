@@ -1,0 +1,871 @@
+import repertoire
+"""j'accéde aux listes encodant les figures que je souhaitte traiter, c'est a dire
+un Herschel et les conduits utilisés. Les manipulant abondament, j'importe également
+leurs rotations afin de ne pas avoir a les modifier a chaque étape.
+Ainsi, le suffixe droite désigne la rotation a droite d'une figure, et de même
+pour droite et gauche."""
+
+herschel=repertoire.herschel
+
+R64=repertoire.R64
+R64droite=repertoire.R64droite
+R64gauche=repertoire.R64gauche
+R64a_l_envers=repertoire.R64a_l_envers
+
+R190=repertoire.R190
+R190droite=repertoire.R190droite
+R190gauche=repertoire.R190gauche
+R190a_l_envers=repertoire.R190a_l_envers
+
+Fx77double=repertoire.Fx77double
+Fx77doubledroite=repertoire.Fx77doubledroite
+Fx77doublegauche=repertoire.Fx77doublegauche
+Fx77doublea_l_envers=repertoire.Fx77doublea_l_envers
+
+F116=repertoire.F116
+F116droite=repertoire.F116droite
+F116gauche=repertoire.F116gauche
+F116a_l_envers=repertoire.F116a_l_envers
+
+F117=repertoire.F117
+F117droite=repertoire.F117droite
+F117gauche=repertoire.F117gauche
+F117a_l_envers=repertoire.F117a_l_envers
+
+L112=repertoire.L112
+L112droite=repertoire.L112droite
+L112gauche=repertoire.L112gauche
+L112a_l_envers=repertoire.L112a_l_envers
+
+"""existe_selon_pa cherche a verifier si il existe un circuit de Herschel de longueur
+pa qui n'utilise que des circuits de repeat time inférieurs à p.
+On recherche donc k1,k2,k3,A et B, sachant que C=A+B-2, qui vérifient la relation
+pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112)"""
+
+def existe_selon_pa(p:int,pa:int):
+    if p>=138:
+        p=pa//2
+        for k2 in range(p//116 +1):
+            p=pa//2-k2*116
+            for k1 in range(p//154+1):
+                p=pa//2-k1*154-k2*116
+                for k3 in range(p//117+1):
+                    p=pa//2-k1*154-k2*116-k3*117
+                    for A in range(p//64+1):
+                        p=pa//2-k1*154-k2*116-k3*117-A*64
+                        for B in range(p//190+1):
+                            if k1+k2+k3>=2*(A+B)-1:
+                                if A+B>=2 :
+                                    if (k1!=0 or A+B>2 or k2<5):
+                                        if k1>0:
+                                            if A+B==2 or (2*(k1-1)+k2+k3+2-2*(A+B))>2:
+                                                if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                                    return (k1,k2,k3,A,B)
+                                        elif k2>0:
+                                            if A+B==2 or (k2+k3+1-2*(A+B))>2:
+                                                if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                                    return (k1,k2,k3,A,B)
+                                        if k1==0 and k2==0 and k3>0:
+                                            if A+B==2 or (k3+1-2*(A+B))>2:
+                                                if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                                    return (k1,k2,k3,A,B)
+    if p>=107:
+        p=pa//2
+        for k1 in range(p//154 +1):
+            p=pa//2-k1*154
+            k2=0
+            for k3 in range(p//117+1):
+                p=pa//2-k1*154-k2*116-k3*117
+                for A in range(p//64+1):
+                    for B in range(p//190+1):
+                        if k1+k3>=2*(A+B)-1:
+                            if A+B>=2 :
+                                if pa==2*(k1*154+k3*117+A*64+B*190+(A+B-2)*112):
+                                    if k1>0:
+                                        if A+B==2 or (2*(k1-1)+k2+k3+2-2*(A+B))>2:
+                                            if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                                return (k1,k2,k3,A,B)
+                                    elif k2>0:
+                                        if A+B==2 or (k2+k3+1-2*(A+B))>2:
+                                            if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                                return (k1,k2,k3,A,B)
+                                    if k1==0 and k2==0 and k3>0:
+                                        if A+B==2 or (k3+1-2*(A+B))>2:
+                                            if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                                return (k1,k2,k3,A,B)
+    if p>=63:
+        p=pa//2
+        for k1 in range(p//154 +1):
+            p=pa//2-k1*154
+            k2=0
+            for k3 in range(p//117+1):
+                p=pa//2-k1*154-k3*117
+                for A in range(2,p//64+1):
+                    B=0
+                    if k1+k3>=2*A-1:
+                        if k1>0:
+                            if A+B==2 or (2*(k1-1)+k2+k3+2-2*(A+B))>2:
+                                if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                    return (k1,k2,k3,A,B)
+                        elif k2>0:
+                            if A+B==2 or (k2+k3+1-2*(A+B))>2:
+                                if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                    return (k1,k2,k3,A,B)
+                        if k1==0 and k2==0 and k3>0:
+                            if A+B==2 or (k3+1-2*(A+B))>2:
+                                if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                    return (k1,k2,k3,A,B)
+    if p>61:
+        p=pa//2
+        for k1 in range(p//154 +1):
+            p=pa//2-k1*154
+            k2=0
+            k3=0
+            for A in range(2,p//64+1):
+                B=0
+                if k1>=2*A-1:
+                    if k1>0:
+                        if A+B==2 or (2*(k1-1)+k2+k3+2-2*(A+B))>2:
+                            if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                return (k1,k2,k3,A,B)
+                    elif k2>0:
+                        if A+B==2 or (k2+k3+1-2*(A+B))>2:
+                            if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                return (k1,k2,k3,A,B)
+                    if k1==0 and k2==0 and k3>0:
+                        if A+B==2 or (k3+1-2*(A+B))>2:
+                            if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                                return (k1,k2,k3,A,B)
+    if p==61:
+        p=pa//2
+        for k1 in range(p//154 +1):
+            k2=0
+            k3=0
+            A=2
+            B=0
+            if k1>=2*A-1:
+                if k1>0:
+                    if A+B==2 or (2*(k1-1)+k2+k3+2-2*(A+B))>2:
+                        if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                            return (k1,k2,k3,A,B)
+                elif k2>0:
+                    if A+B==2 or (k2+k3+1-2*(A+B))>2:
+                        if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                            return (k1,k2,k3,A,B)
+                if k1==0 and k2==0 and k3>0:
+                    if A+B==2 or (k3+1-2*(A+B))>2:
+                        if pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
+                            return (k1,k2,k3,A,B)
+    return False
+
+"""plus_petits essaye de trouver a tel que existe_selon_pa(p*a) trouve une solution
+k1,k2,k3,A,B, en testant toutes les valeures de a jusqu'à ce que le programme finisse,
+et renvoie (a,k1,k2,k3,A,B).
+En pratique, cette boucle while finit toujours. On sait deja qu'une solution existe
+si p n'est divisible ni par 7, ni par 11, en n'utilisant que F154 et R64. La principale
+contrainte est en fait k1,k2,k3,A,B sont positifs."""
+
+def plus_petits(p:int)->(int,int,int,int,int,int):
+    a=0
+    verite=True
+    while verite:
+        a+=1
+        x=existe_selon_pa(p,p*a)
+        if x!= False:
+            k1,k2,k3,A,B=x
+            return (a,k1,k2,k3,A,B)
+
+"""On définit désormais de nombreuses fonctions auxiliaires simples:
+-Les positionner_. Ils renvoient Noner, et modifient une grille l en ajoutant le conduit correspondant
+de sorte qu'un herschel orienté selon r un str et dont le haut gauche a pour coordonées haut_gauche1.
+Le haut gauche est la position dans la grille du haut gauche du plus petit carré contenant toute les
+cases vivantes de ce herschel,
+-tourner_droite et tourner_gauche qui renvoient la rotation d'une grille en entrée sans la modifier
+-Les avancer qui prennent en entrée une grille, une orientation et un haut gauche,
+qui modifient la grille en y ajoutant le circuit correspondant, et renvoient l'orientation r' et
+les coordonnées du haut gauche du herschel aprés déplacement par le conduit """
+
+def positionner_64(l:list[list[int]], haut_gauche1:(int,int), r:str)->None:
+    n, m = len(l), len(l[0])
+    haut_gauche = (haut_gauche1[0], haut_gauche1[1])
+    if r == "droit":
+        bord_gauche = (haut_gauche[0]-12, haut_gauche[1]-1)
+        b = bord_gauche
+        for i in range(len(R64)):
+            for j in range(len(R64[0])):
+                if R64[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    if r == "droite":
+        bord_gauche = (haut_gauche[0]-1, haut_gauche[1]-10)
+        b = bord_gauche
+        for i in range(len(R64droite)):
+            for j in range(len(R64droite[0])):
+                if R64droite[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "gauche":
+        bord_gauche = (haut_gauche[0]-19, haut_gauche[1]-12)
+        b = bord_gauche
+        for i in range(len(R64gauche)):
+            for j in range(len(R64gauche[0])):
+                if R64gauche[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "a l'envers":
+        bord_gauche = (haut_gauche[0]-10, haut_gauche[1]-19)
+        b = bord_gauche
+        for i in range(len(R64a_l_envers)):
+            for j in range(len(R64a_l_envers[0])):
+                if R64a_l_envers[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    return None
+
+def positionner_77double(l:list[list[int]], haut_gauche1:(int,int), r:str)->None:
+    n, m = len(l), len(l[0])
+    haut_gauche = (haut_gauche1[0], haut_gauche1[1])
+    if r == "droit":
+        bord_gauche = (haut_gauche[0]-18, haut_gauche[1]-1)
+        b = bord_gauche
+        for i in range(len(Fx77double)):
+            for j in range(len(Fx77double[0])):
+                if Fx77double[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    if r == "droite":
+        bord_gauche = (haut_gauche[0]-1, haut_gauche[1]-len(Fx77double)+22)
+        b = bord_gauche
+        for i in range(len(Fx77doubledroite)):
+            for j in range(len(Fx77doubledroite[0])):
+                if Fx77doubledroite[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "gauche":
+        bord_gauche = (haut_gauche[0]+4-len(Fx77double[0]), haut_gauche[1]-18)
+        b = bord_gauche
+        for i in range(len(Fx77doublegauche)):
+            for j in range(len(Fx77doublegauche[0])):
+                if Fx77doublegauche[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "a l'envers":
+        bord_gauche = (haut_gauche[0]+22-len(Fx77doublea_l_envers), haut_gauche[1]+4-len(Fx77doublea_l_envers[0]))
+        b = bord_gauche
+        for i in range(len(Fx77doublea_l_envers)):
+            for j in range(len(Fx77doublea_l_envers[0])):
+                if Fx77doublea_l_envers[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    return None
+
+def positionner_116(l:list[list[int]], haut_gauche1:(int,int), r:str)->None:
+    n, m = len(l), len(l[0])
+    haut_gauche = (haut_gauche1[0], haut_gauche1[1])
+    if r == "droit":
+        bord_gauche = (haut_gauche[0]-14, haut_gauche[1]+8)
+        b = bord_gauche
+        for i in range(len(F116)):
+            for j in range(len(F116[0])):
+                if F116[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    if r == "droite":
+        bord_gauche = (haut_gauche[0]+8, haut_gauche[1]-10)
+        b = bord_gauche
+        for i in range(len(F116droite)):
+            for j in range(len(F116droite[0])):
+                if F116droite[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "gauche":
+        bord_gauche = (haut_gauche[0]-24, haut_gauche[1]-14)
+        b = bord_gauche
+        for i in range(len(F116gauche)):
+            for j in range(len(F116gauche[0])):
+                if F116gauche[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "a l'envers":
+        bord_gauche = (haut_gauche[0]-10, haut_gauche[1]-24)
+        b = bord_gauche
+        for i in range(len(F116a_l_envers)):
+            for j in range(len(F116a_l_envers[0])):
+                if F116a_l_envers[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    return None
+
+def positionner_117(l:list[list[int]], haut_gauche1:(int,int), r:str)->None:
+    n, m = len(l), len(l[0])
+    haut_gauche = (haut_gauche1[0], haut_gauche1[1])
+    if r == "droit":
+        bord_gauche = (haut_gauche[0]-15, haut_gauche[1]-2)
+        b = bord_gauche
+        for i in range(len(F117)):
+            for j in range(len(F117[0])):
+                if F117[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    if r == "droite":
+        bord_gauche = (haut_gauche[0]-2, haut_gauche[1]-3)
+        b = bord_gauche
+        for i in range(len(F117droite)):
+            for j in range(len(F117droite[0])):
+                if F117droite[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "gauche":
+        bord_gauche = (haut_gauche[0]-32, haut_gauche[1]-15)
+        b = bord_gauche
+        for i in range(len(F117gauche)):
+            for j in range(len(F117gauche[0])):
+                if F117gauche[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "a l'envers":
+        bord_gauche = (haut_gauche[0]-3, haut_gauche[1]-32)
+        b = bord_gauche
+        for i in range(len(F117a_l_envers)):
+            for j in range(len(F117a_l_envers[0])):
+                if F117a_l_envers[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    return None
+
+def positionner_112(l:list[list[int]], haut_gauche1:(int,int), r:str)->None:
+    n, m = len(l), len(l[0])
+    haut_gauche = (haut_gauche1[0], haut_gauche1[1])
+    if r == "droit":
+        bord_gauche = (haut_gauche[0]-24, haut_gauche[1]-2)
+        b = bord_gauche
+        for i in range(len(L112)):
+            for j in range(len(L112[0])):
+                if L112[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    if r == "droite":
+        bord_gauche = (haut_gauche[0]-2, haut_gauche[1]-6)
+        b = bord_gauche
+        for i in range(len(L112droite)):
+            for j in range(len(L112droite[0])):
+                if L112droite[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "gauche":
+        bord_gauche = (haut_gauche[0]-21, haut_gauche[1]-24)
+        b = bord_gauche
+        for i in range(len(L112gauche)):
+            for j in range(len(L112gauche[0])):
+                if L112gauche[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "a l'envers":
+        bord_gauche = (haut_gauche[0]-6, haut_gauche[1]-21)
+        b = bord_gauche
+        for i in range(len(L112a_l_envers)):
+            for j in range(len(L112a_l_envers[0])):
+                if L112a_l_envers[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    return None
+
+def positionner_190(l:list[list[int]], haut_gauche1:(int,int), r:str)->None:
+    n, m = len(l), len(l[0])
+    haut_gauche = (haut_gauche1[0], haut_gauche1[1])
+    if r == "droit":
+        bord_gauche = (haut_gauche[0]-18, haut_gauche[1]+1)
+        b = bord_gauche
+        for i in range(len(R190)):
+            for j in range(len(R190[0])):
+                if R190[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    if r == "droite":
+        bord_gauche = (haut_gauche[0]+1, haut_gauche[1]-8)
+        b = bord_gauche
+        for i in range(len(R190droite)):
+            for j in range(len(R190droite[0])):
+                if R190droite[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "gauche":
+        bord_gauche = (haut_gauche[0]-34, haut_gauche[1]-18)
+        b = bord_gauche
+        for i in range(len(R190gauche)):
+            for j in range(len(R190gauche[0])):
+                if R190gauche[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    elif r == "a l'envers":
+        bord_gauche = (haut_gauche[0]-8, haut_gauche[1]-34)
+        b = bord_gauche
+        for i in range(len(R190a_l_envers)):
+            for j in range(len(R190a_l_envers[0])):
+                if R190a_l_envers[i][j] == 1:
+                    l[b[0]+i][b[1]+j] = 1
+    return None
+
+"""tourner_droite et tourner_gauche qui renvoient la rotation d'une grille en entrée sans la modifier
+"""
+
+def tourner_droite(l:list[list[int]])->list[list[int]]:
+    n, m = len(l), len(l[0])
+    t = [[0 for j in range(n)] for i in range(m)]
+    for i in range(m):
+        for j in range(n):
+            t[i][j] = l[n-1-j][i]
+    return t
+
+def tourner_gauche(l:list[list[int]])->list[list[int]]:
+    n, m = len(l), len(l[0])
+    t = [[0 for j in range(n)] for i in range(m)]
+    for i in range(n):
+        for j in range(m):
+            t[m-1-j][i] = l[i][j]
+    return t
+
+""" Les avancer qui prennent en entrée une grille, une orientation et un haut gauche,
+qui modifient la grille en y ajoutant le circuit correspondant grace aux positionner
+correspondant, et renvoient l'orientation r' et les coordonnées du haut gauche du herschel
+après déplacement par le conduit correspondant d'un Herschel placé en hautgauche"""
+
+def avancer154(l:list[list[int]], haut_gauche:(int,int), r:str)->None:
+    positionner_77double(l, haut_gauche, r)
+    if r == "droit":
+        haut_gauche1 = (haut_gauche[0], haut_gauche[1]+50)
+    elif r == "a l'envers":
+        haut_gauche1 = (haut_gauche[0], haut_gauche[1]-50)
+    elif r == "gauche":
+        haut_gauche1 = (haut_gauche[0]-50, haut_gauche[1])
+    elif r == "droite":
+        haut_gauche1 = (haut_gauche[0]+50, haut_gauche[1])
+    return haut_gauche1,r
+
+def avancer116(l:list[list[int]], haut_gauche:(int,int), r:str)->None:
+    positionner_116(l, haut_gauche, r)
+    if r == "droit":
+        haut_gauche1 = (haut_gauche[0]+1, haut_gauche[1]+32)
+    elif r == "a l'envers":
+        haut_gauche1 = (haut_gauche[0]-1, haut_gauche[1]-32)
+    elif r == "gauche":
+        haut_gauche1 = (haut_gauche[0]-32, haut_gauche[1]+1)
+    elif r == "droite":
+        haut_gauche1 = (haut_gauche[0]+32, haut_gauche[1]-1)
+    return haut_gauche1,r
+
+def avancer117(l:list[list[int]], haut_gauche:(int,int), r:str)->None:
+    positionner_117(l, haut_gauche, r)
+    if r == "droit":
+        haut_gauche1 = (haut_gauche[0]-6, haut_gauche[1]+40)
+    elif r == "a l'envers":
+        haut_gauche1 = (haut_gauche[0]+6, haut_gauche[1]-40)
+    elif r == "gauche":
+        haut_gauche1 = (haut_gauche[0]-40, haut_gauche[1]-6)
+    elif r == "droite":
+        haut_gauche1 = (haut_gauche[0]+40, haut_gauche[1]+6)
+    return haut_gauche1,r
+
+def avancer64(l:list[list[int]], haut_gauche:(int,int), r:str)->None:
+    positionner_64(l, haut_gauche, r)
+    c = True
+    if c and r == "droit":
+        c=False
+        haut_gauche1=(haut_gauche[0]+10, haut_gauche[1]+11)
+        r1="droite"
+    if c and r == "droite":
+        c=False
+        r1="a l'envers"
+        haut_gauche1=(haut_gauche[0]+11, haut_gauche[1]-9)
+    if c and r == "a l'envers":
+        c=False
+        r1="gauche"
+        haut_gauche1=(haut_gauche[0]-9, haut_gauche[1]-12)
+    if c and r == "gauche":
+        c=False
+        r1="droit"
+        haut_gauche1=(haut_gauche[0]-12, haut_gauche[1]+10)
+    return haut_gauche1,r1
+
+def avancer190(l:list[list[int]], haut_gauche:(int,int), r:str)->None:
+    positionner_190(l, haut_gauche, r)
+    c = True
+    if c and r == "droit":
+        c=False
+        haut_gauche1=(haut_gauche[0]+17, haut_gauche[1]+24)
+        r1="droite"
+    if c and r == "droite":
+        c=False
+        r1="a l'envers"
+        haut_gauche1=(haut_gauche[0]+24, haut_gauche[1]-16)
+    if c and r == "a l'envers":
+        c=False
+        r1="gauche"
+        haut_gauche1=(haut_gauche[0]-16, haut_gauche[1]-25)
+    if c and r == "gauche":
+        c=False
+        r1="droit"
+        haut_gauche1=(haut_gauche[0]-25, haut_gauche[1]+17)
+    return haut_gauche1,r1
+
+def avancer112(l:list[list[int]], haut_gauche:(int,int), r:str)->None:
+    positionner_112(l, haut_gauche, r)
+    c = True
+    if c and r == "droit":
+        c = False
+        haut_gauche1 = (haut_gauche[0]-32, haut_gauche[1]+11)
+        r1 = "gauche"
+    if c and r == "droite":
+        c = False
+        r1 = "droit"
+        haut_gauche1 = (haut_gauche[0]+11, haut_gauche[1]+33)
+    if c and r == "a l'envers":
+        c = False
+        r1 = "droite"
+        haut_gauche1 = (haut_gauche[0]+33, haut_gauche[1]-12)
+    if c and r == "gauche":
+        c=False
+        r1 = "a l'envers"
+        haut_gauche1 = (haut_gauche[0]-12, haut_gauche[1]-32)
+    return haut_gauche1,r1
+
+"""avancer, qui centralise les différents avancer """
+
+def avancer(l:list[list[int]], haut_gauche:(int,int), r:str,n:int)->None:
+    if n==154:
+        return avancer154(l,haut_gauche,r)
+    if n==116:
+        return avancer116(l,haut_gauche,r)
+    if n==117:
+        return avancer117(l,haut_gauche,r)
+    if n==64:
+        return avancer64(l,haut_gauche,r)
+    if n==190:
+        return avancer190(l,haut_gauche,r)
+    if n==112:
+        return avancer112(l,haut_gauche,r)
+
+"""Quelques fonctions auxilliaires un peu plus complexes.
+limit_de_oscillateur_primaire va virtuellement faire parcourir un herschel a travers
+le circuit que je souhaite créer comme oscillateur, afin d'évaluer jusqu'où va le Herschel
+lorsqu'il est le plus bas et le plus a droite, afin de déduire la taille de la grille
+que je dois créer pour contenir l'oscillateur Herschel de constantes (k1,k2,k3,A,B)"""
+
+def limit_de_oscillateur_primaire(k1:int,k2:int,k3:int,A:int,B:int)->(int,int):
+    droit_154,droit_116,droit_117=0,0,0
+    a154,a116,a117,a64,a190=k1,k2,k3,A,B
+    c=True
+    if c and a154>0:
+        droit_154+=1
+        a154-=1
+        c=False
+    elif c and a116>0:
+        droit_116+=1
+        a116-=1
+        c=False
+    elif c and a117>0:
+        droit_117+=1
+        c=False
+        a117-=1
+    if a64==0:
+        b64=0
+        b190=2
+    if a64==1:
+        b64=1
+        b190=1
+    if a64>1:
+        b64=2
+        b190=0
+    a64-=b64
+    a190-=b190
+    for k in range(a64):
+        c=True
+        if c and a154>0:
+            a154-=1
+            c=False
+        elif c and a116>0:
+            a116-=1
+            c=False
+        elif c and a117>0:
+            a117-=1
+            c=False
+        c=True
+        if c and a154>0:
+            droit_154+=1
+            a154-=1
+            c=False
+        elif c and a116>0:
+            droit_116+=1
+            a116-=1
+            c=False
+        elif c and a117>0:
+            droit_117+=1
+            a117-=1
+            c=False
+    for k in range(a190):
+        c=True
+        if c and a154>0:
+            a154-=1
+            c=False
+        elif c and a116>0:
+            a116-=1
+            c=False
+        elif c and a117>0:
+            a117-=1
+            c=False
+        c=True
+        if c and a154>0:
+            droit_154+=1
+            a154-=1
+            c=False
+        elif c and a116>0:
+            droit_116+=1
+            a116-=1
+            c=False
+        elif c and a117>0:
+            droit_117+=1
+            a117-=1
+            c=False
+    if b64==2:
+        droit_64=A-1
+        droit_190=B
+        droite_64=1
+        droite_190=0
+    else:
+        droit_64=A
+        droit_190=B-1
+        droite_64=0
+        droite_190=1
+    droite_154=k1-droit_154
+    droite_116=k2-droit_116
+    droite_117=k3-droit_117
+    droite_112=A+B-2
+    haut_gauche0=120+droite_112*11+droite_190*24+droit_190*17+droit_64*10+droite_64*11+droit_117*(-6)+droite_117*40+droit_116*1+droite_116*32+droite_154*50
+    haut_gauche1=120+droite_112*33+droit_190*24+droit_64*11+droit_117*(40)+droite_117*6+droit_116*32+droite_116*(-1)+droit_154*50
+    return (haut_gauche0,haut_gauche1)
+
+"""Une version simplifiée qui n'est pas en complexité linéaire selon k1+k2+k3+A+B"""
+
+def limit_de_oscillateur(k1:int,k2:int,k3:int,A:int,B:int)->(int,int):
+    b64,b190=(0,2) if A==0 else (1,1) if A==1 else (2,0)
+    a64_rem,max_a64= max(0,A-b64),0
+    a190_rem,max_a190= max(0,B-b190),0
+    T=1+2*(a64_rem+a190_rem)
+    K=k1+k2+k3
+    C=min(T,K)
+    consumed154=min(k1,C)
+    consumed116=min(k2,max(0,C-consumed154))
+    consumed117=min(k3,max(0,C-consumed154-consumed116))
+    def f(s,e):
+        return ((e+1)//2)-((s+1)//2)
+    droit_154=f(0,consumed154)
+    droit_116=f(consumed154,consumed154+consumed116)
+    droit_117=f(consumed154+consumed116,C)
+    droit_64,droit_190,droite_64,droite_190=(A-1,B,1,0) if b64==2 else (A,B-1,0,1)
+    droite_154=k1-droit_154
+    droite_116=k2-droit_116
+    droite_117=k3-droit_117
+    droite_112=A+B-2
+    h0=120+droite_112*11+droite_190*24+droit_190*17+droit_64*10+droite_64*11+droit_117*-6+droite_117*40+droit_116*1+droite_116*32+droite_154*50
+    h1=120+droite_112*33+droit_190*24+droit_64*11+droit_117*40+droite_117*6+droit_116*32+droite_116*-1+droit_154*50
+    return h0,h1
+
+"""etape simule une étape elementaire dans le jeu de la vie, en renvoyant l'état de la cellule
+d'emplacement i,j dans la grille l aprés un tick"""
+
+def etape(l,i,j):
+    acc=-l[i][j]
+    for x in range(i-1,i+2):
+        for y in range(j-1,j+2):
+            acc=acc+l[x][y]
+    if l[i][j]==1 and (acc==2 or acc==3):
+        return 1
+    if l[i][j]==0 and acc==3:
+        return 1
+    return 0
+
+"""tous_a_cote prend en entrée la liste des coordonnées d'une partie M de la grille
+et renvoie la liste des coordonnées des cellules voisines de M.
+Ainsi, si seul un certain nombre de cellules ont changé d'état au dernier tick,
+on peut savoir grace a tous_a_cote quelles cellules sont succeptibles de changer d'état
+au prochain tick."""
+
+def tous_a_cote(l1:list[int,int])->list[int,int]:
+    l=[(a[0],a[1]) for a in l1]
+    for a in l1:
+        i,j=a
+        for x in range(i-1,i+2):
+            for y in range(j-1,j+2):
+                if (x,y) not in l:
+                    l.append((x,y))
+    return l
+
+"""etat_suivant prend en entrée une grille et une liste des coordonnées des cellules
+qui sont succeptibles d'etre modiffié au prochain tick, et fait évoluer la grille d'un tick,
+et la renvoie. si ind=True, il renvoie aussi la liste des coordonnées des cellules
+ayant été modifiées"""
+
+
+def etat_suivant(l,l1=[[]],ind=False)->int:
+    n,m=len(l),len(l[0])
+    if l1==[[]]:
+        l1=[(i,j) for i in range(n) for j in range(m)]
+    t=[l[i[0]][i[1]] for i in l1 ]
+    l2=[]
+    for i in range(len(l1)) :
+        t[i]=etape(l,l1[i][0],l1[i][1])
+        if t[i]!=l[l1[i][0]][l1[i][1]]:
+            l2.append((l1[i][0],l1[i][1]))
+    for i in range(len(l1)):
+        l[l1[i][0]][l1[i][1]] =t[i]
+    if ind:
+        return (l,l2)
+    else:
+        return l
+
+"""la derniere fonction auxilliaire, et la plus couteuse en calcul. C'est pour eviter
+son utilisation que l'on cherche à lineariser le placement des Herschels, c'est a dire a=1 ou a=2.
+C'est pour cela que la complexité est bien plus importante pour a>2.
+remplir_le_chemin prend en entrée une grille l contenant un circuit de herschel encore vide,
+a le nombre d'Herschel a placer et p l'espacement entre deux Herschel. On présuppose que
+le circuit est de longueur p*a, ce cricuit vide étant genéré grace au fonctions avancer.
+l'idée de remplir_le_chemin est de rajouter un Herschel au début du circuit que l'on a
+copié dans la grille l1, puis de faire évoluer a fois la grille l1 de p ticks.
+Entre chaque évolution de p ticks, on prend une "photo" de la grillel1. On repére
+alors sa difference avec l, et l'on modifie l pour faire disparaitre cette différence.
+Mais, si l avait déja été modifié en certaines cases, on ne considére plus ces cases.
+Ainsi, on fait d'abord évoluer le Herschel de p étapes. On le place  dans l.
+Puis, on fait évoluer le Herschel de p autres ticks, donc en tout de 2*p étapes.
+On le rajoute encore dans l. On en fait de même pour 3*p,4*p,...,a*p.
+Ainsi, on remplit bien le chemin ou le circuit de a Herschel éspacés entre eux de p ticks. """
+
+def remplir_le_chemin(l:list[list[int]],p:int,a:int,haut_gauche:(int,int))->None:
+    h=haut_gauche
+    bon=[(h[0]+i,h[1]+j) for i in range(len(herschel)) for j in range(len(herschel[0])) ]
+    for i in range(len(herschel)):
+        for j in range(len(herschel[0])):
+            l[h[0]+i][h[1]+j] = herschel[i][j]
+    bouge=[(h[0]+i,h[1]+j) for i in range(len(herschel)) for j in range(len(herschel[0])) ]
+    l1=[[l[i][j] for j in range(len(l[0]))] for i in range(len(l))]
+    for d in range(a):
+        change=[]
+        for c in range(p):
+            bouge=tous_a_cote(bouge)
+            l1,bouge=etat_suivant(l1,bouge,True)
+            for i in bouge:
+                if i not in change:
+                    change.append(i)
+        for i in change:
+            if i not in bon:
+                l[i[0]][i[1]] = l1[i[0]][i[1]]
+            if i in bon:
+                l1[i[0]][i[1]] = l[i[0]][i[1]]
+        bon=[(i[0],i[1]) for i in change]
+    for i in range(len(herschel)):
+        for j in range(len(herschel[0])):
+            l[h[0]+i][h[1]+j] = herschel[i][j]
+    #print("les herschels ont été placés!")
+    return None
+
+"""étape élementaire pour construire un circuit de Herschel. un_des_F prend en entrée
+une grille l, des coordonnées hautgauche, une orientation r et trois compteurs.
+Un appel à un_des_F a le même effet qu'un appel à la fonction avancer154 ou avancer116
+ou avancer 117, en appelant le premier avancer_n_ tel que a_n_ est non nul. On diminue
+alors de 1 le compteur du conduit qui a été ajouté, et on renvoie
+haut_gauche , a154 , a116 , a117 """
+
+
+def un_des_F(l,haut_gauche,r,a154,a116,a117):
+    c=True
+    if c and a154>0:
+        haut_gauche,r=avancer(l,haut_gauche,r,154)
+        a154-=1
+        c=False
+    elif c and a116>0:
+        haut_gauche,r=avancer(l,haut_gauche,r,116)
+        a116-=1
+        c=False
+    elif c and a117>0:
+        haut_gauche,r=avancer(l,haut_gauche,r,117)
+        c=False
+        a117-=1
+    return haut_gauche,a154,a116,a117
+
+"""Enfin oscillateur qui recolle les bouts, et renvoie une grille contenant un oscillateur p.
+-Un appel à plus_petits(p) fournit a,k1,k2,k3,A,B tels que
+    p*a= 2 * [ k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112 ]
+-Un appel à limit_de_oscillateur nous donne la taille d'une grille dont le p-oscillateur induit
+    par p,a,k1,k2,k3,A,B ne sortira jamais.
+-On crée une grille vide de cette taille, et on place un Herschel droit imaginaire en
+    haut_gauche=(50,50)
+-Puis, a deux reprises, on ajoute un demi-circuit à partie de haut gauche, obtenu en
+    ajoutant par un_des_F un F au départ et en avancant le Herschel imaginaire. On voit
+    ensuite quels R vont être utiliser seuls, c'est a dire ne sont pas compensés par des L112.
+    Puis, pour touts les R restants, et un par un jusqu'à les avoir épuisés:
+        --on ajoute R par avancer en faisant avancer le Herschel imaginaire
+        --on ajoute un F par un_des_F en faisant avancer le Herschel imaginaire
+        --on ajoute L112 par avancer en faisant avancer le Herschel imaginaire
+        --on ajoute un F par un_des_F en faisant avancer le Herschel imaginaire
+    On ajoute un des deux R choisis plus tôt par avancer en faisant avancer le herschel imaginaire
+    puis on ajoute tout les F restants par un_des_R en faisant avancer le herschel imaginaire.
+    On rajoute enfin le deuxième R choisi précedement.
+    On a bien placé dans chaque demi-circuit
+    k1 F154, k2 F116, k3 F117, A R64, B R190 et (A+B-2) L112,
+    donc la taille du circuit total est
+    2 * [ k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112 ]
+    donc p*a
+-Enfin, si a>2, on appele remplir_le_chemin et sinon, si a=1 on place un seul Herschel droit
+    au début du circuit, et si a=2 on ajoute également un Herschel à l'envers à un bout du
+    demi-circuit, car la taille du demi-circuit est p*a/2=p*1
+
+->On a bien construit un oscillateur de période p. En soit, le choix de l'ordre dans lequel
+les conduits sont placé est presque sans conséquence, mais placer des RFLF composés dés
+que possible et finir par un R permet de s'assurer que la cellule vivante la plus à gauche et
+la plus haute soit dans le R de fin ou le F de début, car si on finit par un R cela signifie
+que le Herschel vient d'en bas avant le R. De plus F116 , lorsqu'il est droit, fait avancer
+un Herschel vers la droite et le haut, tandis qu'un RFlF fait avancer un Herschel vers la
+droite et vers le bas. Ainsi, on est sur de redescendre, et d'aller vers la droite, il
+suffit de savoir ou est la limite a droite et en bas pour s'assurer que l'oscillateur
+ne dépasse pas de la grille. Mais on pourrait tout aussi bien determiner
+quel F placer en premier puis quels RFLF, puis quel R, puis quels F, puis quel R placer en dernier
+totalement au hasard
+->La nescessité d'intercaller un F entre un R et un R, un R et un L ou un L et un L
+vient de la necessité d'écarter ces circuits qui sinon interferent entre eux.
+Cette condition n'est en fait pas contraignante pour notre usage car a=1 (ou a=2), qui est la
+meilleur solution possible pour un circuit car la taille de ce circuit sera toujours au moins
+égale a p, est tout de même vérifié à partir d'un certain rang """
+
+def oscillateur(p):
+    if p>=61:
+        a,k1,k2,k3,A,B=plus_petits(p)
+        taillemax=limit_de_oscillateur(k1,k2,k3,A,B)
+        l=[]
+        for i in range(taillemax[0]):
+            l.append([0 for j in range(taillemax[1])])
+        haut_gauche= (50,50 )
+        r = "droit"
+        for x in range(2):
+            if (x==0 and a<=2) :
+                for i in range(len(herschel)):
+                    for j in range(len(herschel[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=herschel[i][j]
+            if (x==1 and a==2) :
+                h=tourner_droite(tourner_droite(herschel))
+                for i in range(len(h)):
+                    for j in range(len(h[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=h[i][j]
+            a154,a116,a117,a64,a190=k1,k2,k3,A,B
+            haut_gauche,a154,a116,a117=un_des_F(l,haut_gauche,r,a154,a116,a117)
+            if a64==0:
+                b64=0
+                b190=2
+            if a64==1:
+                b64=1
+                b190=1
+            if a64>1:
+                b64=2
+                b190=0
+            a64-=b64
+            a190-=b190
+            for k in range(a64):
+                haut_gauche,r=avancer(l,haut_gauche,r,64)
+                haut_gauche,a154,a116,a117=un_des_F(l,haut_gauche,r,a154,a116,a117)
+                haut_gauche,r=avancer(l,haut_gauche,r,112)
+                haut_gauche,a154,a116,a117=un_des_F(l,haut_gauche,r,a154,a116,a117)
+            for k in range(a190):
+                haut_gauche,r=avancer(l,haut_gauche,r,190)
+                haut_gauche,a154,a116,a117=un_des_F(l,haut_gauche,r,a154,a116,a117)
+                haut_gauche,r=avancer(l,haut_gauche,r,112)
+                haut_gauche,a154,a116,a117=un_des_F(l,haut_gauche,r,a154,a116,a117)
+            if b64>=1:
+                haut_gauche,r=avancer(l,haut_gauche,r,64)
+            else:
+                haut_gauche,r=avancer(l,haut_gauche,r,190)
+            while a154+a116+a117>=1:
+                haut_gauche,a154,a116,a117=un_des_F(l,haut_gauche,r,a154,a116,a117)
+            if b64==2:
+                haut_gauche,r=avancer(l,haut_gauche,r,64)
+            else:
+                haut_gauche,r=avancer(l,haut_gauche,r,190)
+        if a>2:
+            remplir_le_chemin(l,p,a,(50,50))
+        return l
+    else:
+        pass
