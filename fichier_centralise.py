@@ -24,18 +24,28 @@ F116=repertoire.F116
 F117=repertoire.F117
 L112=repertoire.L112
 F282=repertoire.F282
+
 semisnarkactif=repertoire.semisnarkactif
 semisnark=repertoire.semisnark
 semisnarkrenverseactif=repertoire.semisnarkrenverseactif
 semisnarkrenverse=repertoire.semisnarkrenverse
+
 eater=repertoire.eater
 snark=repertoire.snark
 snarkrenverse=repertoire.snarkrenverse
 
-scorbiesplitteroff=repertoire.scorbieoff
-scorbiesplitteron=repertoire.scorbieon
-scorbiesplitterrenverseoff=repertoire.scorbierenverseoff
-scorbiesplitterrenverseon=repertoire.scorbierenverseon
+scorbie_splitter_off=repertoire.scorbieoff
+scorbie_splitter_on=repertoire.scorbieon
+scorbie_splitter_renverse_off=repertoire.scorbierenverseoff
+scorbie_splitter_renverse_on=repertoire.scorbierenverseon
+
+h_to_g=repertoire.h_to_g
+syringe=repertoire.syringe
+
+mega_bistable=repertoire.mega_bistable
+mega_bistabledecale=repertoire.mega_bistable_decale
+mega_bistable_sans_sortie=repertoire.mega_bistable_sans_sortie
+mega_bistable_decale_sans_sortie=repertoire.mega_bistable_decale_sans_sortie
 
 """On utilise des dictionaires pour representer des conduits :
 -La clé "droit" correspond au conduit en lui même
@@ -55,12 +65,24 @@ conduitsemisnarkrenverseactif={"droit":semisnarkrenverseactif,"dx,dy":(17,-2),"r
 conduitsemisnark={"droit":semisnark,"dx,dy":(-2,17),"rotation":"gauche","positionne":(7,1),"dimension_de_l'entree":(3,3),"emission":[],"ticks":96}
 conduitsemisnarkrenverse={"droit":semisnarkrenverse,"dx,dy":(17,-2),"rotation":"droite","positionne":(1,6),"dimension_de_l'entree":(3,3),"emission":[],"ticks":96}
 
-conduitscorbiesplitteroff={"droit":scorbiesplitteroff,"dx,dy":(59,0),"rotation":"droit","positionne":(18,-12),"dimension_de_l'entree":(3,3),"emission":[],"ticks":378}
-conduitscorbiesplitterrenverseoff={"droit":scorbiesplitterrenverseoff,"dx,dy":(0,59),"rotation":"droit","positionne":(-11,18),"dimension_de_l'entree":(3,3),"emission":[],"ticks":378}
+conduitscorbie_splitter_off={"droit":scorbie_splitter_off,"dx,dy":(59,0),"rotation":"droit","positionne":(18,-12),"dimension_de_l'entree":(3,3),"emission":[],"ticks":378}
+conduitscorbie_splitter_renverse_off={"droit":scorbie_splitter_renverse_off,"dx,dy":(0,59),"rotation":"droit","positionne":(-11,18),"dimension_de_l'entree":(3,3),"emission":[],"ticks":378}
 
-conduitscorbiesplitteron={"droit":scorbiesplitteron,"dx,dy":(59,0),"rotation":"droit","positionne":(18,-22),"dimension_de_l'entree":(3,3),"emission":[("glider","gauche",395,(39,-14))],"ticks":378}
-conduitscorbiesplitterrenverseon={"droit":scorbiesplitterrenverseon,"dx,dy":(0,59),"rotation":"droit","positionne":(-21,18),"dimension_de_l'entree":(3,3),"emission":[("glider","gauche",395,(39,-14))],"ticks":350}
+conduitscorbie_splitter_on={"droit":scorbie_splitter_on,"dx,dy":(59,0),"rotation":"droit","positionne":(18,-22),"dimension_de_l'entree":(3,3),"emission":[("glider","gauche",395,(39,-14))],"ticks":378}
+conduitscorbie_splitter_renverse_on={"droit":scorbie_splitter_renverse_on,"dx,dy":(0,59),"rotation":"droit","positionne":(-21,18),"dimension_de_l'entree":(3,3),"emission":[("glider","gauche",395,(39,-14))],"ticks":350}
 
+
+conduith_to_g={"droit":h_to_g,"dx,dy":(12,18),"rotation":"droit","positionne":(-28,-2),"dimension_de_l'entree":(4,3),"dimension_de_la_sortie":(3,3),"emission":[],"ticks":86}
+
+conduitsyringe={"droit":syringe,"dx,dy":(10,26),"rotation":"droit","positionne":(3,-3),"dimension_de_l'entree":(3,3),"dimension_de_la_sortie":(4,3),"emission":[],"ticks":127}
+
+conduitmega_bistable={"droit":mega_bistable,"dx,dy":(140,140),"rotation":"droit","positionne":(13,-4),"dimension_de_l'entree":(3,3),"emission":[],"ticks":560,"repeat time":(76,104),"ajout":1042}
+
+conduitmega_bistabledecale={"droit":mega_bistabledecale,"dx,dy":(140,140),"rotation":"droit","positionne":(13,-4),"dimension_de_l'entree":(3,3),"emission":[],"ticks":560,"repeat time":(76,104),"ajout":1042}
+
+conduitmega_bistable_sans_sortie={"droit":mega_bistable_sans_sortie,"dx,dy":(140,140),"rotation":"droit","positionne":(13,-4),"dimension_de_l'entree":(3,3),"emission":[],"ticks":560,"repeat time":(76,104),"ajout":1042}
+
+conduitmega_bistabledecale_sans_sortie={"droit":mega_bistable_decale_sans_sortie,"dx,dy":(140,140),"rotation":"droit","positionne":(13,-4),"dimension_de_l'entree":(3,3),"emission":[],"ticks":560,"repeat time":(76,104),"ajout":1042}
 
 conduiteater={"droit":eater,"dx,dy":(0,0),"rotation":"droit","positionne":(8,6),"dimension_de_l'entree":(4,3),"emission":[]}
 
@@ -83,9 +105,23 @@ conduit190={"droit":R190,"dx,dy":(17,24),"rotation":"droite","positionne":(-18,1
 
 """liste_de_conduit a pour seul but de rassembler tout ces conduit, pour des raisons de lisibilité"""
 
-liste_de_conduit={64:conduit64,112:conduit112,116:conduit116,117:conduit117,154:conduit154,282:conduit282,155:conduit154degun,190:conduit190,"semisnark":conduitsemisnark,"semisnarkrenverse":conduitsemisnarkrenverse}
+liste_de_conduit={64:conduit64,112:conduit112,116:conduit116,117:conduit117,154:conduit154,282:conduit282,155:conduit154degun,190:conduit190,"semisnark":conduitsemisnark,"semisnarkrenverse":conduitsemisnarkrenverse,"snark":conduitsnark,"snarkrenverse":conduitsnarkrenverse,"semisnarkactif":conduitsemisnarkactif,"semisnarkrenverseactif":conduitsemisnarkrenverseactif,"scorbieon":conduitscorbie_splitter_on,"scorbieoff":conduitscorbie_splitter_off,"scorbierenverseon":conduitscorbie_splitter_renverse_on,"scorbierenverseoff":conduitscorbie_splitter_renverse_off,"syringe":conduitsyringe,"h_to_g":conduith_to_g,"mega_bistable":conduitmega_bistable}
 
 """positionner prend en entrée une grille l, la position du haut gauche d'une figure ainsi que son orientation representée par un string"""
+
+def place(l,fig,haut_gauche,r):
+    if r=="droit":
+        l1=[[fig[i][j] for j in range(len(fig[0]))] for i in range(len(fig))]
+    if r=="droite":
+        l1=tourner_droite(fig)
+    if r=="gauche":
+        l1=tourner_gauche(fig)
+    if r=="a l'envers":
+        l1=tourner_gauche(tourner_gauche(fig))
+    a,b=haut_gauche
+    for i in range(len(l1)):
+        for j in range(len(l1[0])):
+            l[i+a][j+b]=l1[i][j]
 
 def positionner(l,haut_gauche,r,conduit):
     a,b=conduit["dimension_de_l'entree"]
@@ -121,15 +157,19 @@ def positionner(l,haut_gauche,r,conduit):
 def avancer(l,haut_gauche,r,conduit):
     positionner(l,haut_gauche,r,conduit)
     a,b=conduit["dimension_de_l'entree"]
+    c,d=a,b
+    if "dimension_de_la_sortie" in conduit:
+        c,d=conduit["dimension_de_la_sortie"]
     dx,dy=conduit["dx,dy"]
     x,y=haut_gauche
+    c,d=a-c,b-d
     if conduit["rotation"]=="droit":
         if r=="droite":
-            dx,dy=dy,-dx
+            dx,dy=dy,-dx+c
         elif r=="gauche":
-            dx,dy=-dy,dx
+            dx,dy=-dy+d,dx
         elif r=="a l'envers":
-            dx,dy=-dx,-dy
+            dx,dy=-dx+c,-dy+d
         return (x+dx,y+dy),r
     elif conduit["rotation"]=="droite":
         if r=="droite":
@@ -784,7 +824,7 @@ def oscillateur_booste_2_0(p):
     positionner(l,haut_gauche,r,conduiteater)
     return l
 
-#nouvelle partie tres tres performante
+
 
 def ecriture_binaire(x,a=-1):
     if a==-1:
@@ -815,14 +855,15 @@ def fin_de_bit(l,haut_gauche,r,liste,d=0):
     haut_gauche=deplace(haut_gauche,r,2+d)
     for i in liste:
         if i==0:
-            haut_gauche,r=avancer(l,haut_gauche,r,conduitscorbiesplitterrenverseoff)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitscorbie_splitter_renverse_off)
         if i==1:
-            haut_gauche,r=avancer(l,haut_gauche,r,conduitscorbiesplitterrenverseon)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitscorbie_splitter_renverse_on)
     return haut_gauche,r
 
-def period_multiplier(l,haut_gauche,r,n,d=0):
+def period_multiplier(l,haut_gauche,r,n,d=0,Ticks=False):
     haut_gauche=deplace(haut_gauche,r,15)
     a=math.log2(n)
+    ticks=60
     if a%1==0:
         liste=[0 for i in range(int(a))]
     else:
@@ -832,10 +873,17 @@ def period_multiplier(l,haut_gauche,r,n,d=0):
     for i in range(len(liste)-1):
         i=len(liste)-i-1
         haut_gauche,r=place_etape_de_bit(l,haut_gauche,r,liste[i])
+        ticks+=266+350
     haut_gauche,r=place_etape_de_bit(l,haut_gauche,r,liste[0],d)
+    ticks+=266+350+4*d
     haut_gauche=deplace(haut_gauche,r,1)
+    ticks+=4
     haut_gauche,r=fin_de_bit(l,haut_gauche,r,liste,d)
-    return haut_gauche,r
+    ticks+=8*4+86+4*(d+2)
+    if Ticks:
+        return haut_gauche,r,ticks
+    else:
+        return haut_gauche,r
 
 
 def check_si_z_existe(p,d,liste):
@@ -982,19 +1030,239 @@ def area_naif(p):
     x,y=limit_de_oscillateur(k1,k2,k3,A,B)
     return x,y
 
-def area_max(p):
+def area_max(p,a=-1,Id=False,k1=-1,k2=-1,k3=-1,A=-1,B=-1):
     if p<69:
         print("oops, la periode doit etre supperieure a 69!")
         return 0
     if p<245:
         return area_naif(p)
-    a=divise(p)
-    d=cherche((p//a),a)
-    nimporte,k1,k2,k3,A,B=plus_petits(p//a)
+    if a==-1:
+        a=divise(p)
+        i=p//a
+    else:
+        i=p
+    d=cherche(i,a)
+    if k1==-1:
+        nimporte,k1,k2,k3,A,B=plus_petits(i)
     x,y=limit_de_oscillateur(k1,k2,k3,A,B)
     x=50+d+59*(int(math.log2(a))+1)+x
     n=d+100-y
     if n<0:
         n=0
     y=75+y+n
+    if Id:
+        return x,y,d
     return x,y
+
+def plus_petit_final(p):
+    model = cp_model.CpModel()
+    multiplier=model.NewIntVar(1, p, 'multiplier')
+    ajout=model.NewIntVar(0, 50, 'ajout')
+    k1 = model.NewIntVar(1, p, 'k1')
+    k2 = model.NewIntVar(0, p, 'k2')
+    k3 = model.NewIntVar(0, p, 'k3')
+    A  = model.NewIntVar(0, p,  'A')
+    B  = model.NewIntVar(0, p, 'B')
+    premier_acc=model.NewIntVar(0, p, 'premier_acc')
+    second_acc=model.NewIntVar(0, p, 'second_acc')
+    model.Add(2*(973+k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112)==second_acc)
+    if p%2==0:
+        model.Add(premier_acc==p-1042-8*ajout)
+    else:
+        model.Add(premier_acc==p-1367-8*ajout)
+    model.AddMultiplicationEquality(premier_acc, [second_acc,multiplier])
+    model.Add(A + B >= 2)
+    model.Add(k1 + k2 + k3 >= 2*(2+A+B))
+    model.Minimize(10000*(k2+A+B-multiplier)+2*(973+k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112))
+    solver = cp_model.CpSolver()
+    status = solver.Solve(model)
+    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        return solver.Value(k1), solver.Value(k2), solver.Value(k3), solver.Value(A), solver.Value(B),solver.Value(multiplier),solver.Value(ajout)
+    else:
+        return False
+
+def canon_final(p):
+    if p>=2000:
+        x=plus_petit_final(p)
+        if x==False:
+            if p>=10**5:
+                print("desole, la periode est trop grande pour etre manipulée par ortools, un module utilisé pour trouver des solutions aux equations a plusieurs variables")
+            else:
+                return canon_booste_max(p)
+        a=1
+        k1,k2,k3,A,B,multiplier,ajout=x
+        if p%2==0:
+            periode_apparente=(p-1042-8*ajout)//multiplier
+        else:
+            periode_apparente=(p-1367-8*ajout)//multiplier
+        x,y,d=area_max(periode_apparente,multiplier,True)
+        x,y=x+200,y+150
+        l=[[0 for i in range(y)] for j in range(x)]
+        haut_gauche=(210+d+59*(int(math.log2(multiplier))+1),60+max(0,d-50))
+        x2,y2=haut_gauche
+        haut_gauche_ressortissant=(x2+29,y2+66)
+        haut_gauche_apparent=(422+d+59*(int(math.log2(multiplier))+1),294+max(0,d-50))
+        r = "droit"
+        liste=creer_liste_pour_oscillateur(k1,k2,k3,A,B)
+        n=len(liste)
+        for x in range(2):
+            if x==0 and a<=2 :
+                for i in range(len(herschel)):
+                    for j in range(len(herschel[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=herschel[i][j]
+            if x==1 and a==2 :
+                h=tourner_droite(tourner_droite(herschel))
+                for i in range(len(h)):
+                    for j in range(len(h[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=h[i][j]
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            if p%2==0:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistable)
+            else:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistabledecale)
+            haut_gauche=deplace(haut_gauche,r,50)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            for i in range(n//2):
+                j=liste[x*n//2+i]
+                haut_gauche,r=avancer(l,haut_gauche,r,liste_de_conduit[j])
+        for i in range(404+d+59*(int(math.log2(multiplier))+1),412+d+59*(int(math.log2(multiplier))+1)):
+            for j in range(307+max(0,d-50),315+max(0,d-50)):
+                l[i][j]=0
+        x1,y1=haut_gauche_apparent
+        haut_gauche_glider,r=(x1-25,y1+5),"a l'envers"
+        haut_gauche_glider=deplace(haut_gauche_glider,r,10)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,78)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,119)
+        ticks=1180+127+560+4*50
+        haut_gauche_glider,r,ticks_en_plus=period_multiplier(l,haut_gauche_glider,r,multiplier,d,True)
+        print(ticks,ticks_en_plus,periode_apparente,d)
+        ticks+=ticks_en_plus
+        ticks+=400
+        le_suivant=ticks%periode_apparente
+        print(le_suivant)
+        if le_suivant<200 or le_suivant>periode_apparente-80 :
+            if ajout<30:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,25)
+            else:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,45)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+            haut_gauche_glider=deplace(haut_gauche_glider,r,5)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche,r=haut_gauche_ressortissant,"gauche"
+        haut_gauche=deplace(haut_gauche,r,ajout)
+        if p%2==1:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,29)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,16)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche=deplace(haut_gauche,r,-5)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        if p%2==0:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,63)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        return l
+    else:
+        return canon_booste_max(p)
+
+def oscillateur_final(p):
+    if p>=2000:
+        x=plus_petit_final(p)
+        if x==False:
+            if p>=10**5:
+                print("desole, la periode est trop grande pour etre manipulée par ortools, un module utilisé pour trouver des solutions aux equations a plusieurs variables")
+            else:
+                return oscillateur_booste_max(p)
+        a=1
+        k1,k2,k3,A,B,multiplier,ajout=x
+        if p%2==0:
+            periode_apparente=(p-1042-8*ajout)//multiplier
+        else:
+            periode_apparente=(p-1367-8*ajout)//multiplier
+        x,y,d=area_max(periode_apparente,multiplier,True)
+        x,y=x+300,y+200
+        l=[[0 for i in range(y)] for j in range(x)]
+        haut_gauche=(210+d+59*(int(math.log2(multiplier))+1),60+max(0,d-50))
+        x2,y2=haut_gauche
+        haut_gauche_ressortissant=(x2+29,y2+66)
+        haut_gauche_apparent=(422+d+59*(int(math.log2(multiplier))+1),294+max(0,d-50))
+        r = "droit"
+        liste=creer_liste_pour_oscillateur(k1,k2,k3,A,B)
+        n=len(liste)
+        for x in range(2):
+            if x==0 and a<=2 :
+                for i in range(len(herschel)):
+                    for j in range(len(herschel[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=herschel[i][j]
+            if x==1 and a==2 :
+                h=tourner_droite(tourner_droite(herschel))
+                for i in range(len(h)):
+                    for j in range(len(h[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=h[i][j]
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            if p%2==0:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistable_sans_sortie)
+            else:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistabledecale_sans_sortie)
+            haut_gauche=deplace(haut_gauche,r,50)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            for i in range(n//2):
+                j=liste[x*n//2+i]
+                haut_gauche,r=avancer(l,haut_gauche,r,liste_de_conduit[j])
+        for i in range(404+d+59*(int(math.log2(multiplier))+1),412+d+59*(int(math.log2(multiplier))+1)):
+            for j in range(307+max(0,d-50),315+max(0,d-50)):
+                l[i][j]=0
+        x1,y1=haut_gauche_apparent
+        haut_gauche_glider,r=(x1-25,y1+5),"a l'envers"
+        haut_gauche_glider=deplace(haut_gauche_glider,r,10)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,78)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,119)
+        ticks=1180+127+560+4*50
+        haut_gauche_glider,r,ticks_en_plus=period_multiplier(l,haut_gauche_glider,r,multiplier,d,True)
+        print(ticks,ticks_en_plus,periode_apparente,d)
+        ticks+=ticks_en_plus
+        ticks+=400
+        le_suivant=ticks%periode_apparente
+        print(le_suivant)
+        if le_suivant<200 or le_suivant>periode_apparente-80 :
+            if ajout<30:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,25)
+            else:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,45)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+            haut_gauche_glider=deplace(haut_gauche_glider,r,5)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche,r=haut_gauche_ressortissant,"gauche"
+        haut_gauche=deplace(haut_gauche,r,ajout)
+        if p%2==1:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,29)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,16)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche=deplace(haut_gauche,r,-5)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        if p%2==0:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,63)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        return l
+    else:
+        return oscillateur_booste_max(p)
