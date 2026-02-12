@@ -14,7 +14,7 @@ glider=[
 [0,0,1],
 [1,1,1]]
 
-import repertoire_complet as repertoire
+import repertoire
 
 R64=repertoire.R64
 R190=repertoire.R190
@@ -109,6 +109,48 @@ liste_de_conduit={64:conduit64,112:conduit112,116:conduit116,117:conduit117,154:
 
 """positionner prend en entrée une grille l, la position du haut gauche d'une figure ainsi que son orientation representée par un string"""
 
+
+def creer_liste_pour_oscillateur(k1,k2,k3,A,B):
+    liste=[154]
+    k1-=1
+    def f(l,k1,k2,k3):
+        if k3>0:
+            l+=[117]
+            return k1,k2,k3-1
+        elif k1>0:
+            l+=[154]
+            return k1-1,k2,k3
+        else:
+            l+=[116]
+            return k1,k2-1,k3
+    if A==0:
+        forget=190
+        B-=2
+        remember=190
+    elif A==1:
+        forget=64
+        A,B=0,B-1
+        remember=190
+    else:
+        A-=2
+        forget=64
+        remember=64
+    for k in range(A):
+        liste+=[64]
+        k1,k2,k3=f(liste,k1,k2,k3)
+        liste+=[112]
+        k1,k2,k3=f(liste,k1,k2,k3)
+    for k in range(B):
+        liste+=[190]
+        k1,k2,k3=f(liste,k1,k2,k3)
+        liste+=[112]
+        k1,k2,k3=f(liste,k1,k2,k3)
+    liste+=[forget]
+    liste+=[117 for i in range(k3)]+[154 for i in range(k1)]+[116 for i in  range(k2)]
+    liste+=[remember]
+    return liste+liste
+
+
 def place(l,fig,haut_gauche,r):
     if r=="droit":
         l1=[[fig[i][j] for j in range(len(fig[0]))] for i in range(len(fig))]
@@ -197,50 +239,6 @@ def avancer(l,haut_gauche,r,conduit):
         pass
 
 
-def liste_pour_diviser_m_par_une_puissance_de_2(m,y):
-    lemax=(y-100)//(17)
-    lemax=lemax+lemax%2-1
-    if lemax<=1 or m<4:
-        l=[]
-        for i in range(m):
-            if i%2==0:
-                l.append(("semisnarkrenverse",0))
-            else:
-                l.append(("semisnark",0))
-        return l,min(1,lemax)
-    l=[("semisnarkrenverse",15),("semisnarkrenverse",0)]
-    verite=False
-    compteur=2
-    d=0
-    for i in range(m-3):
-        verite=not verite
-        if compteur<lemax:
-            if verite:
-                l.append(("semisnark",d))
-            else:
-                l.append(("semisnarkrenverse",d))
-            compteur+=1
-            d=0
-        elif compteur==lemax:
-            compteur=1
-            if not verite:
-                l.append(("semisnark",35))
-            else:
-                l.append(("semisnarkrenverse",35))
-            d=10
-    x=(m-1)%lemax
-    if x%2==0:
-        if not verite:
-            l.append(("semisnark",0))
-        else:
-            l.append(("semisnarkrenverse",0))
-    else:
-        if verite:
-            l.append(("semisnark",0))
-        else:
-            l.append(("semisnarkrenverse",0))
-    return l,lemax
-
 def deplace(haut_gauche,r,d):
     if r=="droit":
         return (haut_gauche[0]+d, haut_gauche[1]+d)
@@ -251,116 +249,6 @@ def deplace(haut_gauche,r,d):
     elif r=="a l'envers":
         return (haut_gauche[0]-d, haut_gauche[1]-d)
 
-
-def positioner_de_liste(haut_gauche,liste,lmodifier,r):
-    for x,d in liste:
-        haut_gauche=deplace(haut_gauche,r,d)
-        haut_gauche,r=avancer(lmodifier, haut_gauche,r,liste_de_conduit[x])
-    return haut_gauche,r
-
-
-"""existe_selon_pa cherche a verifier si il existe un circuit de Herschel de longueur
-pa qui n'utilise que des circuits de repeat time inférieurs à p.
-On recherche donc k1,k2,k3,A et B, sachant que C=A+B-2, qui vérifient la relation
-pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112)"""
-
-from ortools.sat.python import cp_model
-
-def plus_petits_primaire(p):
-    if p%7!=0 and p%11!=0:
-        model = cp_model.CpModel()
-        a=model.NewIntVar(1,1000,'a')
-        k1 = model.NewIntVar(1, p, 'k1')
-        model.Add(2*154*k1+4*64== p*a)
-        model.Minimize(k1)
-        solver = cp_model.CpSolver()
-        status = solver.Solve(model)
-        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-            return solver.Value(a),solver.Value(k1),0,0,2,0
-        else:
-            return False
-    else:
-        model = cp_model.CpModel()
-        a=model.NewIntVar(1,1000,'a')
-        k1 = model.NewIntVar(2, p, 'k1')
-        model.Add(2*154*k1+2*76*282+4*64== p*a)
-        model.Minimize(k1)
-        solver = cp_model.CpSolver()
-        status = solver.Solve(model)
-        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-            return solver.Value(a),solver.Value(k1),0,0,2,0
-        else:
-            return False
-def plus_petits(p):
-    def existe_selon_pa(periode:int,pa:int):
-        p=pa//2
-        for k2 in range(p//116 +1):
-            if periode>=138 or k2==0:
-                p=pa//2-k2*116
-                for k1 in range(1,p//154+1):
-                    p=pa//2-k1*154-k2*116
-                    for k3 in range(p//117+1):
-                        p=pa//2-k1*154-k2*116-k3*117
-                        if periode>=63 or k3==0:
-                            for A in range(p//64+1):
-                                p=pa//2-k1*154-k2*116-k3*117-A*64
-                                if periode>=62 or A==2:
-                                    for B in range(p//190+1):
-                                        if periode>=107 or B==0:
-                                            if k1+k2+k3>=2*(A+B) and A+B>=2 and pa==2*(k1*154+k2*116+k3*117+A*64+B*190+(A+B-2)*112):
-                                                return (k1,k2,k3,A,B)
-        return False
-    """plus_petits essaye de trouver a tel que existe_selon_pa(p*a) trouve une solution
-    k1,k2,k3,A,B, en testant toutes les valeures de a jusqu'à ce que le programme finisse,
-    et renvoie (a,k1,k2,k3,A,B).
-    En pratique, cette boucle while finit toujours. On sait deja qu'une solution existe
-    si p n'est divisible ni par 7, ni par 11, en n'utilisant que F154 et R64. La principale
-    contrainte est en fait k1,k2,k3,A,B sont positifs."""
-
-    def plus_petits_naif(p:int)->(int,int,int,int,int,int):
-        a=p%2
-        verite=True
-        while verite:
-            a+=1
-            x=existe_selon_pa(p,p*a)
-            if x!= False:
-                k1,k2,k3,A,B=x
-                return (a,k1,k2,k3,A,B)
-
-    def existe_selon_pa_sat(pa):
-        model = cp_model.CpModel()
-        p_max = pa // 2
-        k1 = model.NewIntVar(1, p_max//154, 'k1')
-        k2 = model.NewIntVar(0, p_max//116, 'k2')
-        k3 = model.NewIntVar(0, p_max//117, 'k3')
-        A  = model.NewIntVar(0, p_max//64,  'A')
-        B  = model.NewIntVar(0, p_max//190, 'B')
-        model.Add(2*(k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112) == pa)
-        model.Add(A + B >= 2)
-        model.Add(k1 + k2 + k3 >= 2*(A+B))
-        model.Minimize(k2)
-        model.Minimize(A+B)
-        model.Minimize(k2)
-        solver = cp_model.CpSolver()
-        status = solver.Solve(model)
-        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-            return solver.Value(k1), solver.Value(k2), solver.Value(k3), solver.Value(A), solver.Value(B)
-        else:
-            return False
-
-    def plus_petit_sat(p:int)->(int,int,int,int,int,int):
-        a=p%2
-        verite=True
-        while verite:
-            a+=1
-            x=existe_selon_pa_sat(p*a)
-            if x!= False:
-                k1,k2,k3,A,B=x
-                return (a,k1,k2,k3,A,B)
-
-    if p>=138:
-        return plus_petit_sat(p)
-    return plus_petits_naif(p)
 
 
 """tourner_droite et tourner_gauche qui renvoient la rotation d'une grille en entrée sans la modifier
@@ -426,167 +314,6 @@ def limit_de_oscillateur(k1:int,k2:int,k3:int,A:int,B:int)->(int,int):
 """etape simule une étape elementaire dans le jeu de la vie, en renvoyant l'état de la cellule
 d'emplacement i,j dans la grille l aprés un tick"""
 
-def etape(l,i,j):
-    acc=-l[i][j]
-    for x in range(i-1,i+2):
-        for y in range(j-1,j+2):
-            acc=acc+l[x][y]
-    if l[i][j]==1 and (acc==2 or acc==3):
-        return 1
-    if l[i][j]==0 and acc==3:
-        return 1
-    return 0
-
-"""tous_a_cote prend en entrée la liste des coordonnées d'une partie M de la grille
-et renvoie la liste des coordonnées des cellules voisines de M.
-Ainsi, si seul un certain nombre de cellules ont changé d'état au dernier tick,
-on peut savoir grace a tous_a_cote quelles cellules sont succeptibles de changer d'état
-au prochain tick."""
-
-def tous_a_cote(l1:list[int,int])->list[int,int]:
-    l={(a[0],a[1]) for a in l1}
-    for a in l1:
-        i,j=a
-        for x in range(i-1,i+2):
-            for y in range(j-1,j+2):
-                if (x,y) not in l:
-                    l.add((x,y))
-    return list(l)
-
-"""etat_suivant prend en entrée une grille et une liste des coordonnées des cellules
-qui sont succeptibles d'etre modiffié au prochain tick, et fait évoluer la grille d'un tick,
-et la renvoie. si ind=True, il renvoie aussi la liste des coordonnées des cellules
-ayant été modifiées"""
-
-
-def etat_suivant(l,l1=[[]],ind=False)->int:
-    n,m=len(l),len(l[0])
-    if l1==[[]]:
-        l1=[(i,j) for i in range(n) for j in range(m)]
-    t=[l[i[0]][i[1]] for i in l1 ]
-    l2=[]
-    for i in range(len(l1)) :
-        t[i]=etape(l,l1[i][0],l1[i][1])
-        if t[i]!=l[l1[i][0]][l1[i][1]]:
-            l2.append((l1[i][0],l1[i][1]))
-    for i in range(len(l1)):
-        l[l1[i][0]][l1[i][1]] =t[i]
-    if ind:
-        return (l,l2)
-    else:
-        return l
-
-"""la derniere fonction auxilliaire, et la plus couteuse en calcul. C'est pour eviter
-son utilisation que l'on cherche à lineariser le placement des Herschels, c'est a dire a=1 ou a=2.
-C'est pour cela que la complexité est bien plus importante pour a>2.
-remplir_le_chemin prend en entrée une grille l contenant un circuit de herschel encore vide,
-a le nombre d'Herschel a placer et p l'espacement entre deux Herschel. On présuppose que
-le circuit est de longueur p*a, ce cricuit vide étant genéré grace au fonctions avancer.
-l'idée de remplir_le_chemin est de rajouter un Herschel au début du circuit que l'on a
-copié dans la grille l1, puis de faire évoluer a fois la grille l1 de p ticks.
-Entre chaque évolution de p ticks, on prend une "photo" de la grillel1. On repére
-alors sa difference avec l, et l'on modifie l pour faire disparaitre cette différence.
-Mais, si l avait déja été modifié en certaines cases, on ne considére plus ces cases.
-Ainsi, on fait d'abord évoluer le Herschel de p étapes. On le place  dans l.
-Puis, on fait évoluer le Herschel de p autres ticks, donc en tout de 2*p étapes.
-On le rajoute encore dans l. On en fait de même pour 3*p,4*p,...,a*p.
-Ainsi, on remplit bien le chemin ou le circuit de a Herschel éspacés entre eux de p ticks. """
-
-def remplir_le_chemin(l:list[list[int]],p:int,a:int,haut_gauche:(int,int))->None:
-    h=haut_gauche
-    bon=[(h[0]+i,h[1]+j) for i in range(len(herschel)) for j in range(len(herschel[0])) ]
-    for i in range(len(herschel)):
-        for j in range(len(herschel[0])):
-            l[h[0]+i][h[1]+j] = herschel[i][j]
-    bouge=[(h[0]+i,h[1]+j) for i in range(len(herschel)) for j in range(len(herschel[0])) ]
-    l1=[[l[i][j] for j in range(len(l[0]))] for i in range(len(l))]
-    for d in range(a-1):
-        change=[]
-        for c in range(p):
-            bouge=tous_a_cote(bouge)
-            l1,bouge=etat_suivant(l1,bouge,True)
-            for i in bouge:
-                if i not in change:
-                    change.append(i)
-        for i in change:
-            if i not in bon:
-                l[i[0]][i[1]] = l1[i[0]][i[1]]
-            if i in bon:
-                l1[i[0]][i[1]] = l[i[0]][i[1]]
-        bon=[(i[0],i[1]) for i in change]
-    for i in range(len(herschel)):
-        for j in range(len(herschel[0])):
-            l[h[0]+i][h[1]+j] = herschel[i][j]
-    #print("les herschels ont été placés!")
-    return None
-
-"""étape élementaire pour construire un circuit de Herschel. un_des_F prend en entrée
-une grille l, des coordonnées hautgauche, une orientation r et trois compteurs.
-Un appel à un_des_F a le même effet qu'un appel à la fonction avancer154 ou avancer116
-ou avancer 117, en appelant le premier avancer_n_ tel que a_n_ est non nul. On diminue
-alors de 1 le compteur du conduit qui a été ajouté, et on renvoie
-haut_gauche , a154 , a116 , a117 """
-
-
-def un_des_F(l,haut_gauche,r,a154,a116,a117):
-    c=True
-    if c and a117>0:
-        haut_gauche,r=avancer(l,haut_gauche,r,conduit117)
-        c=False
-        a117-=1
-    if c and a154>0:
-        haut_gauche,r=avancer(l,haut_gauche,r,conduit154)
-        a154-=1
-        c=False
-    if c and a116>0:
-        haut_gauche,r=avancer(l,haut_gauche,r,conduit116)
-        a116-=1
-        c=False
-    return haut_gauche,a154,a116,a117
-
-"""Enfin oscillateur qui recolle les bouts, et renvoie une grille contenant un oscillateur p.
--Un appel à plus_petits(p) fournit a,k1,k2,k3,A,B tels que
-    p*a= 2 * [ k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112 ]
--Un appel à limit_de_oscillateur nous donne la taille d'une grille dont le p-oscillateur induit
-    par p,a,k1,k2,k3,A,B ne sortira jamais.
--On crée une grille vide de cette taille, et on place un Herschel droit imaginaire en
-    haut_gauche=(50,50)
--Puis, a deux reprises, on ajoute un demi-circuit à partie de haut gauche, obtenu en
-    ajoutant par un_des_F un F au départ et en avancant le Herschel imaginaire. On voit
-    ensuite quels R vont être utiliser seuls, c'est a dire ne sont pas compensés par des L112.
-    Puis, pour touts les R restants, et un par un jusqu'à les avoir épuisés:
-        --on ajoute R par avancer en faisant avancer le Herschel imaginaire
-        --on ajoute un F par un_des_F en faisant avancer le Herschel imaginaire
-        --on ajoute L112 par avancer en faisant avancer le Herschel imaginaire
-        --on ajoute un F par un_des_F en faisant avancer le Herschel imaginaire
-    On ajoute un des deux R choisis plus tôt par avancer en faisant avancer le herschel imaginaire
-    puis on ajoute tout les F restants par un_des_R en faisant avancer le herschel imaginaire.
-    On rajoute enfin le deuxième R choisi précedement.
-    On a bien placé dans chaque demi-circuit
-    k1 F154, k2 F116, k3 F117, A R64, B R190 et (A+B-2) L112,
-    donc la taille du circuit total est
-    2 * [ k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112 ]
-    donc p*a
--Enfin, si a>2, on appele remplir_le_chemin et sinon, si a=1 on place un seul Herschel droit
-    au début du circuit, et si a=2 on ajoute également un Herschel à l'envers à un bout du
-    demi-circuit, car la taille du demi-circuit est p*a/2=p*1
-
-->On a bien construit un oscillateur de période p. En soit, le choix de l'ordre dans lequel
-les conduits sont placé est presque sans conséquence, mais placer des RFLF composés dés
-que possible et finir par un R permet de s'assurer que la cellule vivante la plus à gauche et
-la plus haute soit dans le R de fin ou le F de début, car si on finit par un R cela signifie
-que le Herschel vient d'en bas avant le R. De plus F116 , lorsqu'il est droit, fait avancer
-un Herschel vers la droite et le haut, tandis qu'un RFlF fait avancer un Herschel vers la
-droite et vers le bas. Ainsi, on est sur de redescendre, et d'aller vers la droite, il
-suffit de savoir ou est la limite a droite et en bas pour s'assurer que l'oscillateur
-ne dépasse pas de la grille. Mais on pourrait tout aussi bien determiner
-quel F placer en premier puis quels RFLF, puis quel R, puis quels F, puis quel R placer en dernier
-totalement au hasard
-->La nescessité d'intercaller un F entre un R et un R, un R et un L ou un L et un L
-vient de la necessité d'écarter ces circuits qui sinon interferent entre eux.
-Cette condition n'est en fait pas contraignante pour notre usage car a=1 (ou a=2), qui est la
-meilleur solution possible pour un circuit car la taille de ce circuit sera toujours au moins
-égale a p, est tout de même vérifié à partir d'un certain rang """
 
 def oscillateur_de_constante(p,a,k1,k2,k3,A,B):
     if p>=61:
@@ -650,128 +377,6 @@ def oscillateur(p):
     a,k1,k2,k3,A,B=plus_petits(p)
     return oscillateur_de_constante(p,a,k1,k2,k3,A,B)
 
-def oscillateur_de_liste(p,a,liste,lmodifier,haut_gauche=(50,50)):
-    if p>=61:
-        l=lmodifier
-        n=len(liste)
-        r = "droit"
-        for x in range(2):
-            if x==0 and a<=2 :
-                for i in range(len(herschel)):
-                    for j in range(len(herschel[0])):
-                        l[haut_gauche[0]+i][haut_gauche[1]+j]=herschel[i][j]
-            if x==1 and a==2 :
-                h=tourner_droite(tourner_droite(herschel))
-                for i in range(len(h)):
-                    for j in range(len(h[0])):
-                        l[haut_gauche[0]+i][haut_gauche[1]+j]=h[i][j]
-            for i in range(n//2):
-                j=liste[x*n//2+i]
-                haut_gauche,r=avancer(l,haut_gauche,r,liste_de_conduit[j])
-        if a>2:
-            remplir_le_chemin(l,p,a,haut_gauche)
-        return l
-    else:
-        pass
-
-def creer_liste_pour_oscillateur(k1,k2,k3,A,B):
-    liste=[154]
-    k1-=1
-    def f(l,k1,k2,k3):
-        if k3>0:
-            l+=[117]
-            return k1,k2,k3-1
-        elif k1>0:
-            l+=[154]
-            return k1-1,k2,k3
-        else:
-            l+=[116]
-            return k1,k2-1,k3
-    if A==0:
-        forget=190
-        B-=2
-        remember=190
-    elif A==1:
-        forget=64
-        A,B=0,B-1
-        remember=190
-    else:
-        A-=2
-        forget=64
-        remember=64
-    for k in range(A):
-        liste+=[64]
-        k1,k2,k3=f(liste,k1,k2,k3)
-        liste+=[112]
-        k1,k2,k3=f(liste,k1,k2,k3)
-    for k in range(B):
-        liste+=[190]
-        k1,k2,k3=f(liste,k1,k2,k3)
-        liste+=[112]
-        k1,k2,k3=f(liste,k1,k2,k3)
-    liste+=[forget]
-    liste+=[117 for i in range(k3)]+[154 for i in range(k1)]+[116 for i in  range(k2)]
-    liste+=[remember]
-    return liste+liste
-
-def creer_liste_pour_oscillateur_primaire(p,k1,k2,k3,A,B):
-    liste=[154]
-    if p%7==0 or p%11==0:
-        liste+=[282 for i in range(76)]
-    k1-=1
-    def f(l,k1,k2,k3):
-        if k3>0:
-            l+=[117]
-            return k1,k2,k3-1
-        elif k1>0:
-            l+=[154]
-            return k1-1,k2,k3
-        else:
-            l+=[116]
-            return k1,k2-1,k3
-    if A==0:
-        forget=190
-        B-=2
-        remember=190
-    elif A==1:
-        forget=64
-        A,B=0,B-1
-        remember=190
-    else:
-        A-=2
-        forget=64
-        remember=64
-    for k in range(A):
-        liste+=[64]
-        k1,k2,k3=f(liste,k1,k2,k3)
-        liste+=[112]
-        k1,k2,k3=f(liste,k1,k2,k3)
-    for k in range(B):
-        liste+=[190]
-        k1,k2,k3=f(liste,k1,k2,k3)
-        liste+=[112]
-        k1,k2,k3=f(liste,k1,k2,k3)
-    liste+=[forget]
-    liste+=[117 for i in range(k3)]+[154 for i in range(k1)]+[116 for i in  range(k2)]
-    liste+=[remember]
-    return liste+liste
-
-def oscillateur_avec_liste(p):
-    a,k1,k2,k3,A,B=plus_petits(p)
-    x,y=limit_de_oscillateur(k1,k2,k3,A,B)
-    l=[[0 for j in range(y)] for i in range(x)]
-    liste=creer_liste_pour_oscillateur(k1,k2,k3,A,B)
-    return oscillateur_de_liste(p,a,liste,l)
-
-def oscillateur_primaire(p):
-    a,k1,k2,k3,A,B=plus_petits_primaire(p)
-    x,y=limit_de_oscillateur(k1,k2,k3,A,B)
-    if p%7==0 or p%11==0:
-        x,y=x+76*53,y+76*53
-    l=[[0 for j in range(y)] for i in range(x)]
-    liste=creer_liste_pour_oscillateur_primaire(p,k1,k2,k3,A,B)
-    return oscillateur_de_liste(p,a,liste,l)
-
 def canon_naif(p):
     if p>=69:
         l=oscillateur(p)
@@ -779,7 +384,6 @@ def canon_naif(p):
             for j in range(63,71):
                 l[i][j]=0
         return l
-
 
 def canon_booste(p,ind=False):
     m=0
@@ -798,26 +402,6 @@ def canon_booste(p,ind=False):
     return l
 
 import math
-def canon_booste_2_0(p,ind=False,ind2=False):
-    m=0
-    while p%(2**(m+2))==0 and (p//(2**(m+1))>1395 or (ind2 and p//2**(m+1)>69)):
-        m+=1
-    l1=canon_naif(p//2**m)
-    l=[[l1[i][j] for j in range(len(l1[0]))]+[0 for i in range(35*(int(math.sqrt(m))))] for i in range(len(l1))]
-    liste,lemax=liste_pour_diviser_m_par_une_puissance_de_2(m,len(l[0]))
-    print(liste,lemax)
-    x=m//lemax+1
-    l=[[0 for i in range(len(l[0]))] for j in range(70*x)]+l
-    haut_gauche,r=(25+70*x,55),"a l'envers"
-    haut_gauche,r=positioner_de_liste(haut_gauche,liste,l,r)
-    if ind:
-        return l,haut_gauche,r
-    return l
-
-def oscillateur_booste(p):
-    l,haut_gauche,r=canon_booste(p,True)
-    positionner(l,haut_gauche,r,conduiteater)
-    return l
 
 def oscillateur_booste_2_0(p):
     l,haut_gauche,r=canon_booste_2_0(p,True)
@@ -947,21 +531,6 @@ def cherche(p,a):
         liste=[0]+ecriture_binaire(2**(int(x)+1)-a)
     return cherche_binaire(p,liste,1000)
 
-def divise(p):
-    if p<245:
-        return False
-    model = cp_model.CpModel()
-    multiplier = model.NewIntVar(1, p//245, 'multiplier')
-    periode = model.NewIntVar(245, p, 'periode')
-    model.AddMultiplicationEquality(p, [periode, multiplier])
-    model.Minimize(periode)
-    solver = cp_model.CpSolver()
-    status = solver.Solve(model)
-    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        return solver.Value(multiplier)
-    else:
-        return False
-
 def canon_booste_max(p,d=-1):
     if p<69:
         print("oops, la periode doit etre supperieure a 69!")
@@ -1009,7 +578,7 @@ def oscillateur_booste_max(p,d=-1):
     if n<0:
         n=0
     l=[[0 for i in range(75)]+l1+[0 for i in range(n)] for l1 in l]
-    haut_gauche,r=period_multiplier_bis(l,haut_gauche,r,a,d)
+    haut_gauche,r=period_multiplier(l,haut_gauche,r,a,d)
     haut_gauche=deplace(haut_gauche,r,15)
     positionner(l,haut_gauche,r,conduiteater)
     return l
@@ -1058,7 +627,7 @@ def area_naif(p):
     x,y=limit_de_oscillateur(k1,k2,k3,A,B)
     return x,y
 
-def area_max(p,a=-1,Id=False,k1=-1,k2=-1,k3=-1,A=-1,B=-1,d=-1):
+def area_max(p,a=-1,Id=False,k1=-1,k2=-1,k3=-1,A=-1,B=-1):
     if p<69:
         print("oops, la periode doit etre supperieure a 69!")
         return 0
@@ -1069,8 +638,7 @@ def area_max(p,a=-1,Id=False,k1=-1,k2=-1,k3=-1,A=-1,B=-1,d=-1):
         i=p//a
     else:
         i=p
-    if d==-1:
-        d=cherche(i,a)
+    d=cherche(i,a)
     if k1==-1:
         nimporte,k1,k2,k3,A,B=plus_petits(i)
     x,y=limit_de_oscillateur(k1,k2,k3,A,B)
@@ -1083,34 +651,6 @@ def area_max(p,a=-1,Id=False,k1=-1,k2=-1,k3=-1,A=-1,B=-1,d=-1):
         return x,y,d
     return x,y
 
-def plus_petit_final(p):
-    model = cp_model.CpModel()
-    multiplier=model.NewIntVar(1, p, 'multiplier')
-    ajout=model.NewIntVar(0, 50, 'ajout')
-    k1 = model.NewIntVar(1, p, 'k1')
-    k2 = model.NewIntVar(0, p, 'k2')
-    k3 = model.NewIntVar(0, p, 'k3')
-    A  = model.NewIntVar(0, p,  'A')
-    B  = model.NewIntVar(0, p, 'B')
-    premier_acc=model.NewIntVar(0, p, 'premier_acc')
-    second_acc=model.NewIntVar(0, p, 'second_acc')
-    model.Add(2*(973+k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112)==second_acc)
-    if p%2==0:
-        model.Add(premier_acc==p-1042-8*ajout)
-    else:
-        model.Add(premier_acc==p-1367-8*ajout)
-    model.AddMultiplicationEquality(premier_acc, [second_acc,multiplier])
-    model.Add(A + B >= 2)
-    model.Add(k1 + k2 + k3 >= 2*(2+A+B))
-    model.Minimize(10000*(k2+A+B-multiplier)+2*(973+k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112))
-    solver = cp_model.CpSolver()
-    status = solver.Solve(model)
-    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        return solver.Value(k1), solver.Value(k2), solver.Value(k3), solver.Value(A), solver.Value(B),solver.Value(multiplier),solver.Value(ajout)
-    else:
-        return False
-
-
 dico={}
 for sum in range(0,96):
     for k2 in range(0,min(sum+1,11)):
@@ -1122,18 +662,19 @@ for sum in range(0,96):
                         p_apparent=2*(973+k1*154 + k2*116 + k3*117 + A*64 + B*190 + (A+B-2)*112)
                         if p_apparent not in dico:
                             dico[p_apparent]=(k1,k2,k3,A,B)
-liste=list(dico.keys())
+les_cles=list(dico.keys())
 
-for i in range(len(liste)):
-    i=len(liste)-i-1
-    p_app=liste[i]
+for i in range(len(les_cles)):
+    i=len(les_cles)-i-1
+    p_app=les_cles[i]
     x=0
     while x<i:
-        if p_app%liste[x]==0:
+        if p_app%les_cles[x]==0:
             del dico[p_app]
             x=i+1
         x+=1
-liste=list(dico.keys())
+les_cles=list(dico.keys())
+les_cles.sort()
 def trouver_sans_sat(p):
     for ajout in range(51):
         if p%2==0:
@@ -1141,9 +682,10 @@ def trouver_sans_sat(p):
         else:
             acc=p-1367-8*ajout
         if acc>0:
-            for p_app in liste:
+            for p_app in les_cles:
                 if acc%p_app==0:
                     k1,k2,k3,A,B=dico[p_app]
+                    print(p_app)
                     return k1,k2,k3,A,B,acc//p_app,ajout
     return False
 
@@ -1161,8 +703,8 @@ def canon_final(p):
             periode_apparente=(p-1042-8*ajout)//multiplier
         else:
             periode_apparente=(p-1367-8*ajout)//multiplier
-        x,y,d=area_max(periode_apparente,multiplier,True,k1,k2,k3,A,B,25)
-        x,y=x+500,y+550
+        x,y,d=area_max(periode_apparente,multiplier,True,k1,k2,k3,A,B)
+        x,y=x+200,y+150
         l=[[0 for i in range(y)] for j in range(x)]
         haut_gauche=(210+d+59*(int(math.log2(multiplier))+1),60+max(0,d-50))
         x2,y2=haut_gauche
@@ -1246,15 +788,16 @@ def oscillateur_final(p):
         if x==False:
             if p>=10**5:
                 print("desole, la periode est trop grande pour etre manipulée par ortools, un module utilisé pour trouver des solutions aux equations a plusieurs variables")
+                return []
             else:
-                return oscillateur_booste_max(p)
+                return oscillateur(p)
         a=1
         k1,k2,k3,A,B,multiplier,ajout=x
         if p%2==0:
             periode_apparente=(p-1042-8*ajout)//multiplier
         else:
             periode_apparente=(p-1367-8*ajout)//multiplier
-        x,y,d=area_max(periode_apparente,multiplier,True,k1,k2,k3,A,B,25)
+        x,y,d=area_max(periode_apparente,multiplier,True,k1,k2,k3,A,B)
         x,y=x+400,y+300
         l=[[0 for i in range(y)] for j in range(x)]
         haut_gauche=(210+d+59*(int(math.log2(multiplier))+1),60+max(0,d-50))
@@ -1296,11 +839,9 @@ def oscillateur_final(p):
         haut_gauche_glider=deplace(haut_gauche_glider,r,119)
         ticks=1180+127+560+4*50
         haut_gauche_glider,r,ticks_en_plus=period_multiplier(l,haut_gauche_glider,r,multiplier,d,True)
-        print(ticks,ticks_en_plus,periode_apparente,d)
         ticks+=ticks_en_plus
         ticks+=400
         le_suivant=ticks%periode_apparente
-        print(le_suivant)
         if le_suivant<200 or le_suivant>periode_apparente-80 :
             if ajout<30:
                 haut_gauche_glider=deplace(haut_gauche_glider,r,25)
@@ -1331,14 +872,142 @@ def oscillateur_final(p):
             haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
         return l
     else:
-        return oscillateur_booste_max(p)
+        return oscillateur(p)
 
+def oscillateur_final_bis(p):
+    if p>=2000:
+        x=trouver_sans_sat(p)
+        if x==False:
+            if p>=10**5:
+                print("desole, la periode est trop grande pour etre manipulée par ortools, un module utilisé pour trouver des solutions aux equations a plusieurs variables")
+                return []
+            else:
+                return oscillateur(p)
+        a=1
+        k1,k2,k3,A,B,multiplier,ajout=x
+        if p%2==0:
+            periode_apparente=(p-1042-8*ajout)//multiplier
+        else:
+            periode_apparente=(p-1367-8*ajout)//multiplier
+        x,y,d=area_max(periode_apparente,multiplier,True,k1,k2,k3,A,B)
+        x,y=x+400,y+300
+        l=[[0 for i in range(y)] for j in range(x)]
+        haut_gauche=(210+d+59*(int(math.log2(multiplier))+1),60+max(0,d-50))
+        x2,y2=haut_gauche
+        haut_gauche_ressortissant=(x2+29,y2+66)
+        haut_gauche_apparent=(422+d+59*(int(math.log2(multiplier))+1),294+max(0,d-50))
+        r = "droit"
+        liste=creer_liste_pour_oscillateur(k1,k2,k3,A,B)
+        n=len(liste)
+        for x in range(2):
+            if x==0 and a<=2 :
+                for i in range(len(herschel)):
+                    for j in range(len(herschel[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=herschel[i][j]
+            if x==1 and a==2 :
+                h=tourner_droite(tourner_droite(herschel))
+                for i in range(len(h)):
+                    for j in range(len(h[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=h[i][j]
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            if p%2==0:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistable_sans_sortie)
+            else:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistabledecale_sans_sortie)
+            haut_gauche=deplace(haut_gauche,r,50)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            for i in range(n//2):
+                j=liste[x*n//2+i]
+                haut_gauche,r=avancer(l,haut_gauche,r,liste_de_conduit[j])
+        for i in range(404+d+59*(int(math.log2(multiplier))+1),412+d+59*(int(math.log2(multiplier))+1)):
+            for j in range(307+max(0,d-50),315+max(0,d-50)):
+                l[i][j]=0
+        x1,y1=haut_gauche_apparent
+        haut_gauche_glider,r=(x1-25,y1+5),"a l'envers"
+        haut_gauche_glider=deplace(haut_gauche_glider,r,10)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,78)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,119)
+        ticks=1180+127+560+4*50
+        haut_gauche_glider,r,ticks_en_plus=period_multiplier_bis(l,haut_gauche_glider,r,multiplier,d,True)
+        ticks+=ticks_en_plus
+        ticks+=400
+        le_suivant=ticks%periode_apparente
+        if le_suivant<200 or le_suivant>periode_apparente-80 :
+            if ajout<30:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,25)
+            else:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,45)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+            haut_gauche_glider=deplace(haut_gauche_glider,r,5)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche,r=haut_gauche_ressortissant,"gauche"
+        haut_gauche=deplace(haut_gauche,r,ajout)
+        if p%2==1:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,29)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,16)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche=deplace(haut_gauche,r,-5)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        if p%2==0:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,63)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        return l
+    else:
+        return oscillateur(p)
+
+def area_final(p,x):
+    if p<2000:
+        return 1,1
+    if x==False:
+        if p>=10**5:
+            print("desole, la periode est trop grande pour etre manipulée par ortools, un module utilisé pour trouver des solutions aux equations a plusieurs variables")
+            return 1,1
+        else:
+            return 1,1
+    k1,k2,k3,A,B,multiplier,ajout=x
+    if p%2==0:
+        periode_apparente=(p-1042-8*ajout)//multiplier
+    else:
+        periode_apparente=(p-1367-8*ajout)//multiplier
+    x,y,d=area_max(periode_apparente,multiplier,True,k1,k2,k3,A,B)
+    x,y=x+400,y+300
+    return x,y,d
+
+def area_max_peu_pres(p,a=-1,k1=-1,k2=-1,k3=-1,A=-1,B=-1):
+    if p<69:
+        print("oops, la periode doit etre supperieure a 69!")
+        return 0
+    if p<245:
+        return area_naif(p)
+    if a==-1:
+        a=divise(p)
+        i=p//a
+    else:
+        i=p
+    if k1==-1:
+        nimporte,k1,k2,k3,A,B=plus_petits(i)
+    x,y=limit_de_oscillateur(k1,k2,k3,A,B)
+    x=50+50+59*(int(math.log2(a))+1)+x
+    n=50+100-y
+    if n<0:
+        n=0
+    y=75+y+n
+    return x,y
 
 def area_final_peu_pres(p,x):
     if p<2000:
         return 1,1
-    if x==-1:
-        x=trouver_sans_sat(p)
     if x==False:
         if p>=10**5:
             print("desole, la periode est trop grande pour etre manipulée par ortools, un module utilisé pour trouver des solutions aux equations a plusieurs variables")
@@ -1354,5 +1023,104 @@ def area_final_peu_pres(p,x):
     x,y=x+400,y+300
     return x,y
 
-def area_final(p):
-    return area_final_peu_pres(p,trouver_sans_sat(p))
+def oscillateur_final_test(p,x,l,d):
+    if p>=2000 and x!=False:
+        a=1
+        k1,k2,k3,A,B,multiplier,ajout=x
+        if p%2==0:
+            periode_apparente=(p-1042-8*ajout)//multiplier
+        else:
+            periode_apparente=(p-1367-8*ajout)//multiplier
+        haut_gauche=(210+d+59*(int(math.log2(multiplier))+1),60+max(0,d-50))
+        x2,y2=haut_gauche
+        haut_gauche_ressortissant=(x2+29,y2+66)
+        haut_gauche_apparent=(422+d+59*(int(math.log2(multiplier))+1),294+max(0,d-50))
+        r = "droit"
+        liste=creer_liste_pour_oscillateur(k1,k2,k3,A,B)
+        n=len(liste)
+        for x in range(2):
+            if x==0 and a<=2 :
+                for i in range(len(herschel)):
+                    for j in range(len(herschel[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=herschel[i][j]
+            if x==1 and a==2 :
+                h=tourner_droite(tourner_droite(herschel))
+                for i in range(len(h)):
+                    for j in range(len(h[0])):
+                        l[haut_gauche[0]+i][haut_gauche[1]+j]=h[i][j]
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            if p%2==0:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistable_sans_sortie)
+            else:
+                haut_gauche,r=avancer(l,haut_gauche,r,conduitmega_bistabledecale_sans_sortie)
+            haut_gauche=deplace(haut_gauche,r,50)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            for i in range(n//2):
+                j=liste[x*n//2+i]
+                haut_gauche,r=avancer(l,haut_gauche,r,liste_de_conduit[j])
+        for i in range(404+d+59*(int(math.log2(multiplier))+1),412+d+59*(int(math.log2(multiplier))+1)):
+            for j in range(307+max(0,d-50),315+max(0,d-50)):
+                l[i][j]=0
+        x1,y1=haut_gauche_apparent
+        haut_gauche_glider,r=(x1-25,y1+5),"a l'envers"
+        haut_gauche_glider=deplace(haut_gauche_glider,r,10)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,78)
+        haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+        haut_gauche_glider=deplace(haut_gauche_glider,r,119)
+        ticks=1180+127+560+4*50
+        haut_gauche_glider,r,ticks_en_plus=period_multiplier(l,haut_gauche_glider,r,multiplier,d,True)
+        ticks+=ticks_en_plus
+        ticks+=400
+        le_suivant=ticks%periode_apparente
+        if le_suivant<200 or le_suivant>periode_apparente-80 :
+            if ajout<30:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,25)
+            else:
+                haut_gauche_glider=deplace(haut_gauche_glider,r,45)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+            haut_gauche_glider=deplace(haut_gauche_glider,r,5)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnark)
+            haut_gauche_glider,r=avancer(l,haut_gauche_glider,r,conduitsnarkrenverse)
+        haut_gauche,r=haut_gauche_ressortissant,"gauche"
+        haut_gauche=deplace(haut_gauche,r,ajout)
+        if p%2==1:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,29)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsyringe)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduith_to_g)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,16)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnark)
+            haut_gauche=deplace(haut_gauche,r,-5)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        if p%2==0:
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+            haut_gauche=deplace(haut_gauche,r,63)
+            haut_gauche,r=avancer(l,haut_gauche,r,conduitsnarkrenverse)
+        return l
+    else:
+        return None
+#
+# import time
+# f=open("test_final_parallel","w")
+# f.write("[(")
+# for x in range(140,200):
+#     debut=int(math.exp(x/10))
+#     for p in range(debut,debut+10000):
+#         t=time.time_ns()
+#         x=trouver_sans_sat(p)
+#         if x!=False:
+#             t1=time.time_ns()
+#             x1,y1,d=area_final(p,x)
+#             t2=time.time_ns()
+#             l=[[0 for i in range(y1)] for j in range(x1)]
+#             t3=time.time_ns()
+#             oscillateur_final_test(p,x,l,d)
+#             t4=time.time_ns()
+#             f.write(""+str(p)+","+str(t1-t)+","+str(t2-t1)+","+str(t3-t2)+","+str(t4-t3)+"),(")
+#             f.flush()
+# f.close()
